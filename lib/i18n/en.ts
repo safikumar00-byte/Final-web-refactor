@@ -17,7 +17,7 @@ export default {
   ok: 'OK',
 
   // Home Screen
-  homeTitle: 'Gold & Silver Signals',
+  homeTitle: 'Gold & Silver Signasfddls',
   homeSubtitle: 'Live Trading Opportunities',
   livePrice: 'Live Price',
   high: 'High',
