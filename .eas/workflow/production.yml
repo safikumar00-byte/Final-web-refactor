@@ -1,0 +1,21 @@
+
+name: Production - Android + Web
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_android:
+    name: Build Android Production
+    type: build
+    params:
+      platform: android
+      profile: production
+
+  deploy_web:
+    name: Deploy Web Production
+    type: deploy
+    params:
+      prod: true
