@@ -347,16 +347,3 @@ function getDefaultMetrics(): PerformanceMetrics {
   };
 }
 
-// Export all functions
-export {
-  fetchSignalAnalytics,
-  calculatePerformanceMetrics,
-  getUserWatchlist,
-  addToWatchlist,
-  removeFromWatchlist,
-  getSignalComments,
-  addSignalComment,
-  startTradingSession,
-  updateTradingSession,
-  endTradingSession,
-};

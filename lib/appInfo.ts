@@ -17,6 +17,8 @@ export interface AppInfo {
 
 // Fetch app information
 export async function fetchAppInfo(): Promise<AppInfo | null> {
+  const defaults = getDefaultAppInfo();
+
   try {
     const { data, error } = await supabase
       .from('app_info')
@@ -25,15 +27,49 @@ export async function fetchAppInfo(): Promise<AppInfo | null> {
       .limit(1)
       .single();
 
-    if (error) {
-      console.error('Error fetching app info:', error);
-      return getDefaultAppInfo();
+    if (error || !data) {
+      console.warn('Supabase app_info query returned error or empty, using defaults:', error?.message);
+      return defaults;
     }
 
-    return data;
+    // Safely parse and sanitize features array
+    let sanitizedFeatures = data.features;
+    if (typeof sanitizedFeatures === 'string') {
+      try {
+        sanitizedFeatures = JSON.parse(sanitizedFeatures);
+      } catch {
+        sanitizedFeatures = defaults.features;
+      }
+    }
+    if (!Array.isArray(sanitizedFeatures) || sanitizedFeatures.length === 0) {
+      sanitizedFeatures = defaults.features;
+    }
+
+    // Safely parse and sanitize how_to_use array
+    let sanitizedHowToUse = data.how_to_use;
+    if (typeof sanitizedHowToUse === 'string') {
+      try {
+        sanitizedHowToUse = JSON.parse(sanitizedHowToUse);
+      } catch {
+        sanitizedHowToUse = defaults.how_to_use;
+      }
+    }
+    if (!Array.isArray(sanitizedHowToUse) || sanitizedHowToUse.length === 0) {
+      sanitizedHowToUse = defaults.how_to_use;
+    }
+
+    return {
+      ...defaults,
+      ...data,
+      title: data.title?.trim() || defaults.title,
+      subtitle: data.subtitle?.trim() || defaults.subtitle,
+      description: data.description?.trim() || defaults.description,
+      features: sanitizedFeatures,
+      how_to_use: sanitizedHowToUse,
+    };
   } catch (error) {
-    console.error('Network error fetching app info:', error);
-    return getDefaultAppInfo();
+    console.error('Network error fetching app info, using defaults:', error);
+    return defaults;
   }
 }
 

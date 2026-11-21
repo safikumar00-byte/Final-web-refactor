@@ -1,5 +1,6 @@
 import { Link, Stack } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Button, Text } from 'heroui-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Chrome as Home } from 'lucide-react-native';
 
@@ -13,11 +14,11 @@ export default function NotFoundScreen() {
         <Text style={styles.description}>
           The page you're looking for doesn't exist.
         </Text>
-        <Link href="/" style={styles.link}>
-          <View style={styles.linkButton}>
+        <Link href="/" asChild>
+          <Button variant="primary" style={styles.linkButton}>
             <Home size={20} color="#000" />
-            <Text style={styles.linkText}>Go to Home</Text>
-          </View>
+            <Button.Label style={styles.linkText}>Go to Home</Button.Label>
+          </Button>
         </Link>
       </View>
     </SafeAreaView>

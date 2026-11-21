@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { Button, Surface, Text } from 'heroui-native';
 import { useTheme } from '../contexts/ThemeContext';
 
 interface AssetSwitcherProps {
@@ -51,10 +52,11 @@ export default function AssetSwitcher({ selectedAsset, onAssetChange }: AssetSwi
   });
 
   return (
-    <View style={styles.container}>
+    <Surface style={styles.container}>
       {assets.map((asset) => (
-        <TouchableOpacity
+        <Button
           key={asset.symbol}
+          variant={selectedAsset === asset.symbol ? 'primary' : 'ghost'}
           style={[
             styles.assetButton,
             selectedAsset === asset.symbol && styles.assetButtonActive,
@@ -62,16 +64,16 @@ export default function AssetSwitcher({ selectedAsset, onAssetChange }: AssetSwi
           onPress={() => onAssetChange(asset.symbol as 'XAU/USD' | 'BTC/USD')}
         >
           <Text style={styles.assetEmoji}>{asset.emoji}</Text>
-          <Text
+          <Button.Label
             style={[
               styles.assetText,
               selectedAsset === asset.symbol && styles.assetTextActive,
             ]}
           >
             {asset.name}
-          </Text>
-        </TouchableOpacity>
+          </Button.Label>
+        </Button>
       ))}
-    </View>
+    </Surface>
   );
 }

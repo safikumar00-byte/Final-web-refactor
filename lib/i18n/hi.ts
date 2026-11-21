@@ -2,6 +2,7 @@ export default {
   // Navigation
   home: 'होम',
   signals: 'सिग्नल',
+  history: 'इतिहास',
   calculator: 'कैलकुलेटर',
   settings: 'सेटिंग्स',
   

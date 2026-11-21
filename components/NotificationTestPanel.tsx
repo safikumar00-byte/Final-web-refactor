@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
-  TouchableOpacity,
   Alert,
   ScrollView,
-  TextInput,
 } from 'react-native';
+import { Button, Card, Input, PressableFeedback, Surface, Text } from 'heroui-native';
 import { Bell, Send, TestTube, Award, TrendingUp, CircleAlert as AlertCircle, Users, User } from 'lucide-react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -323,30 +321,31 @@ export default function NotificationTestPanel() {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {testButtons.map((button) => (
-          <TouchableOpacity
+          <PressableFeedback
             key={button.id}
-            style={styles.testButton}
             onPress={button.onPress}
           >
-            <View style={[
-              styles.testButtonIcon,
-              { backgroundColor: `${button.color}20` }
-            ]}>
-              <button.icon size={20} color={button.color} />
-            </View>
-            <View style={styles.testButtonContent}>
-              <Text style={styles.testButtonTitle}>{button.title}</Text>
-              <Text style={styles.testButtonDescription}>{button.description}</Text>
-            </View>
-            <Send size={16} color={colors.textSecondary} style={styles.sendIcon} />
-          </TouchableOpacity>
+            <Surface style={styles.testButton}>
+              <View style={[
+                styles.testButtonIcon,
+                { backgroundColor: `${button.color}20` }
+              ]}>
+                <button.icon size={20} color={button.color} />
+              </View>
+              <View style={styles.testButtonContent}>
+                <Text style={styles.testButtonTitle}>{button.title}</Text>
+                <Text style={styles.testButtonDescription}>{button.description}</Text>
+              </View>
+              <Send size={16} color={colors.textSecondary} style={styles.sendIcon} />
+            </Surface>
+          </PressableFeedback>
         ))}
 
         {/* Custom Notification Section */}
         <View style={styles.customSection}>
           <Text style={styles.sectionTitle}>Custom Notification</Text>
           
-          <TextInput
+          <Input
             style={styles.input}
             placeholder="Notification title"
             placeholderTextColor={colors.textSecondary}
@@ -354,7 +353,7 @@ export default function NotificationTestPanel() {
             onChangeText={setCustomTitle}
           />
           
-          <TextInput
+          <Input
             style={[styles.input, { height: 80 }]}
             placeholder="Notification message"
             placeholderTextColor={colors.textSecondary}
@@ -364,17 +363,17 @@ export default function NotificationTestPanel() {
             textAlignVertical="top"
           />
           
-          <TouchableOpacity style={styles.customButton} onPress={handleCustomNotification}>
-            <Text style={styles.customButtonText}>Send Custom</Text>
+          <Button variant="primary" style={styles.customButton} onPress={handleCustomNotification}>
+            <Button.Label style={styles.customButtonText}>Send Custom</Button.Label>
             <Send size={16} color={colors.background} />
-          </TouchableOpacity>
+          </Button>
         </View>
 
         {/* Targeted Notification Section */}
         <View style={styles.customSection}>
           <Text style={styles.sectionTitle}>Targeted Notification</Text>
           
-          <TextInput
+          <Input
             style={styles.input}
             placeholder="Target user ID (e.g., device_123...)"
             placeholderTextColor={colors.textSecondary}
@@ -382,10 +381,10 @@ export default function NotificationTestPanel() {
             onChangeText={setTargetUserId}
           />
           
-          <TouchableOpacity style={styles.customButton} onPress={handleTargetedNotification}>
+          <Button variant="primary" style={styles.customButton} onPress={handleTargetedNotification}>
             <User size={16} color={colors.background} style={{ marginRight: 8 }} />
-            <Text style={styles.customButtonText}>Send Targeted</Text>
-          </TouchableOpacity>
+            <Button.Label style={styles.customButtonText}>Send Targeted</Button.Label>
+          </Button>
         </View>
 
         <View style={styles.warning}>

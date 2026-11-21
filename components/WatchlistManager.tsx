@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
-  TextInput,
   Alert,
   Modal,
 } from 'react-native';
+import { Button, Card, Input, Label, Surface, Text } from 'heroui-native';
 import { Plus, X, Bell, BellOff, Star, StarOff } from 'lucide-react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import {
@@ -289,14 +287,14 @@ export default function WatchlistManager({ userId, onWatchlistChange }: Watchlis
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <Card style={styles.container}>
+      <Card.Header style={[styles.header, { padding: 0 }]}>
         <Text style={styles.title}>My Watchlist</Text>
-        <TouchableOpacity style={styles.addButton} onPress={() => setShowAddModal(true)}>
+        <Button size="sm" variant="primary" style={styles.addButton} onPress={() => setShowAddModal(true)}>
           <Plus size={16} color={colors.background} />
-          <Text style={styles.addButtonText}>Add</Text>
-        </TouchableOpacity>
-      </View>
+          <Button.Label style={styles.addButtonText}>Add</Button.Label>
+        </Button>
+      </Card.Header>
 
       {watchlist.length === 0 ? (
         <View style={styles.emptyState}>
@@ -308,7 +306,7 @@ export default function WatchlistManager({ userId, onWatchlistChange }: Watchlis
       ) : (
         <ScrollView showsVerticalScrollIndicator={false}>
           {watchlist.map((item) => (
-            <View key={item.id} style={styles.watchlistItem}>
+            <Surface key={item.id} style={styles.watchlistItem}>
               <View style={styles.pairInfo}>
                 <Text style={styles.pairName}>{item.pair}</Text>
                 {(item.price_alert_high || item.price_alert_low) && (
@@ -320,21 +318,24 @@ export default function WatchlistManager({ userId, onWatchlistChange }: Watchlis
                 )}
               </View>
               <View style={styles.actions}>
-                <TouchableOpacity style={styles.actionButton}>
+                <Button isIconOnly size="sm" variant="ghost" style={styles.actionButton}>
                   {item.notification_enabled ? (
                     <Bell size={16} color={colors.primary} />
                   ) : (
                     <BellOff size={16} color={colors.textSecondary} />
                   )}
-                </TouchableOpacity>
-                <TouchableOpacity
+                </Button>
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="ghost"
                   style={styles.actionButton}
                   onPress={() => handleRemoveFromWatchlist(item.pair)}
                 >
                   <X size={16} color={colors.error} />
-                </TouchableOpacity>
+                </Button>
               </View>
-            </View>
+            </Surface>
           ))}
         </ScrollView>
       )}
@@ -347,39 +348,41 @@ export default function WatchlistManager({ userId, onWatchlistChange }: Watchlis
         onRequestClose={() => setShowAddModal(false)}
       >
         <View style={styles.modal}>
-          <View style={styles.modalContent}>
+          <Card style={styles.modalContent}>
             <Text style={styles.modalTitle}>Add to Watchlist</Text>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Select Trading Pair</Text>
+              <Label style={styles.label}>Select Trading Pair</Label>
               <View style={styles.pairSelector}>
                 {availablePairs
                   .filter(pair => !watchlist.some(w => w.pair === pair))
                   .map((pair) => (
-                    <TouchableOpacity
+                    <Button
                       key={pair}
+                      size="sm"
+                      variant={newPair === pair ? 'primary' : 'outline'}
                       style={[
                         styles.pairOption,
                         newPair === pair && styles.pairOptionSelected,
                       ]}
                       onPress={() => setNewPair(pair)}
                     >
-                      <Text
+                      <Button.Label
                         style={[
                           styles.pairOptionText,
                           newPair === pair && styles.pairOptionTextSelected,
                         ]}
                       >
                         {pair}
-                      </Text>
-                    </TouchableOpacity>
+                      </Button.Label>
+                    </Button>
                   ))}
               </View>
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>High Price Alert (Optional)</Text>
-              <TextInput
+              <Label style={styles.label}>High Price Alert (Optional)</Label>
+              <Input
                 style={styles.input}
                 placeholder="Enter high price alert"
                 placeholderTextColor={colors.textSecondary}
@@ -390,8 +393,8 @@ export default function WatchlistManager({ userId, onWatchlistChange }: Watchlis
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Low Price Alert (Optional)</Text>
-              <TextInput
+              <Label style={styles.label}>Low Price Alert (Optional)</Label>
+              <Input
                 style={styles.input}
                 placeholder="Enter low price alert"
                 placeholderTextColor={colors.textSecondary}
@@ -402,22 +405,24 @@ export default function WatchlistManager({ userId, onWatchlistChange }: Watchlis
             </View>
 
             <View style={styles.modalActions}>
-              <TouchableOpacity
+              <Button
+                variant="ghost"
                 style={[styles.modalButton, styles.cancelButton]}
                 onPress={() => setShowAddModal(false)}
               >
-                <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+                <Button.Label style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Button.Label>
+              </Button>
+              <Button
+                variant="primary"
                 style={[styles.modalButton, styles.confirmButton]}
                 onPress={handleAddToWatchlist}
               >
-                <Text style={[styles.buttonText, styles.confirmButtonText]}>Add</Text>
-              </TouchableOpacity>
+                <Button.Label style={[styles.buttonText, styles.confirmButtonText]}>Add</Button.Label>
+              </Button>
             </View>
-          </View>
+          </Card>
         </View>
       </Modal>
-    </View>
+    </Card>
   );
 }

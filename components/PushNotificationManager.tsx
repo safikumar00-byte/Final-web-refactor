@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
+import { Button, Card, Text } from 'heroui-native';
 import { Bell, BellOff, Smartphone, CircleCheck as CheckCircle, CircleAlert as AlertCircle } from 'lucide-react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -210,39 +211,34 @@ export default function PushNotificationManager({ onRegistrationComplete }: Push
   });
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.iconContainer}>
-          <statusInfo.icon size={20} color={statusInfo.color} />
+    <Card style={styles.container}>
+      <Card.Body style={{ padding: 0 }}>
+        <View style={styles.header}>
+          <View style={styles.iconContainer}>
+            <statusInfo.icon size={20} color={statusInfo.color} />
+          </View>
+          <View style={styles.textContainer}>
+            <Text style={styles.title}>{statusInfo.title}</Text>
+            <Text style={styles.subtitle}>{statusInfo.subtitle}</Text>
+          </View>
         </View>
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>{statusInfo.title}</Text>
-          <Text style={styles.subtitle}>{statusInfo.subtitle}</Text>
-        </View>
-      </View>
 
-      {statusInfo.action && (
-        <TouchableOpacity
-          style={[
-            styles.actionButton,
-            isRegistering && styles.actionButtonDisabled
-          ]}
-          onPress={statusInfo.action.onPress}
-          disabled={isRegistering}
-        >
-          <Text style={styles.actionButtonText}>
-            {isRegistering ? t('registering') : statusInfo.action.text}
-          </Text>
-        </TouchableOpacity>
-      )}
-
-      {/* {deviceId && (
-        <View style={styles.deviceInfo}>
-          <Text style={styles.deviceText}>
-            {t('deviceId')}: {deviceId.substring(0, 20)}...
-          </Text>
-        </View>
-      )} */}
-    </View>
+        {statusInfo.action && (
+          <Button
+            variant="primary"
+            style={[
+              styles.actionButton,
+              isRegistering && styles.actionButtonDisabled
+            ]}
+            onPress={statusInfo.action.onPress}
+            isDisabled={isRegistering}
+          >
+            <Button.Label style={styles.actionButtonText}>
+              {isRegistering ? t('registering') : statusInfo.action.text}
+            </Button.Label>
+          </Button>
+        )}
+      </Card.Body>
+    </Card>
   );
 }

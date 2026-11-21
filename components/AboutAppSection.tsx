@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
-  TouchableOpacity,
   Linking,
   ScrollView,
 } from 'react-native';
-import { Mail, MessageCircle, Twitter, Linkedin, ExternalLink, CheckCircle, Play } from 'lucide-react-native';
+import { Button, Text, Chip, Surface } from 'heroui-native';
+import { Mail, MessageCircle, Twitter, Linkedin, CheckCircle, Sparkles, Compass } from 'lucide-react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { AppInfo, fetchAppInfo } from '../lib/appInfo';
 import CampaignBanner from './CampaignBanner';
 import { Campaign, getRandomSignalsPageCampaign } from '../lib/campaigns';
+import DigitalMorphHeading from './DigitalMorphHeading';
 
-export default function AboutAppSection() {
+interface AboutAppSectionProps {
+  onClose?: () => void;
+  showCampaign?: boolean;
+}
+
+export default function AboutAppSection({ showCampaign = true }: AboutAppSectionProps) {
   const { colors, fontSizes } = useTheme();
   const { t } = useLanguage();
   const [appInfo, setAppInfo] = useState<AppInfo | null>(null);
@@ -23,8 +28,10 @@ export default function AboutAppSection() {
 
   useEffect(() => {
     loadAppInfo();
-    loadCampaign();
-  }, []);
+    if (showCampaign) {
+      loadCampaign();
+    }
+  }, [showCampaign]);
 
   const loadAppInfo = async () => {
     try {
@@ -40,7 +47,17 @@ export default function AboutAppSection() {
   const loadCampaign = async () => {
     try {
       const randomCampaign = await getRandomSignalsPageCampaign();
-      setCampaign(randomCampaign);
+      // Sanitize campaign: filter out placeholder/test entries with negative or non-professional titles
+      if (
+        randomCampaign &&
+        randomCampaign.title &&
+        !randomCampaign.title.toLowerCase().includes('get the hell out') &&
+        !randomCampaign.title.toLowerCase().includes('nothing works out')
+      ) {
+        setCampaign(randomCampaign);
+      } else {
+        setCampaign(null);
+      }
     } catch (error) {
       console.error('Error loading campaign:', error);
     }
@@ -72,85 +89,122 @@ export default function AboutAppSection() {
     }
   };
 
-
-
   const styles = StyleSheet.create({
     container: {
+      flex: 1,
+      backgroundColor: 'transparent',
+    },
+    contentContainer: {
+      // paddingHorizontal: 20,
+      // paddingVertical: 16,
+      paddingVertical: 40,
+    },
+    loadingContainer: {
+      padding: 30,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    loadingText: {
+      fontSize: fontSizes.medium,
+      fontFamily: 'Inter-Medium',
+      textAlign: 'center',
+    },
+    campaignContainer: {
+      marginBottom: 16,
+    },
+    brandBadgeRow: {
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: 'bold',
+      color: colors.text,
+      fontFamily: 'Inter-Bold',
+      marginBottom: 6,
+      textAlign: 'center',
+    },
+    subtitle: {
+      fontSize: fontSizes.medium,
+      color: colors.primary,
+      fontFamily: 'Inter-SemiBold',
+      marginBottom: 12,
+      textAlign: 'center',
+    },
+    descriptionCard: {
       backgroundColor: colors.surface,
-      borderRadius: 16,
-      padding: 20,
+      borderRadius: 12,
+      padding: 14,
       marginBottom: 20,
       borderWidth: 1,
       borderColor: colors.border,
     },
-    loadingText: {
-      fontSize: fontSizes.medium,
-      fontFamily: 'Inter-Regular',
-      textAlign: 'center',
-      padding: 20,
-    },
-    title: {
-      fontSize: fontSizes.title,
-      fontWeight: 'bold',
-      color: colors.text,
-      fontFamily: 'Inter-Bold',
-      marginBottom: 8,
-      textAlign: 'center',
-    },
-    subtitle: {
-      fontSize: fontSizes.subtitle,
-      color: colors.primary,
-      fontFamily: 'Inter-SemiBold',
-      marginBottom: 16,
-      textAlign: 'center',
-    },
     description: {
       fontSize: fontSizes.medium,
-      color: colors.text,
+      color: colors.textSecondary,
       fontFamily: 'Inter-Regular',
       lineHeight: 22,
-      marginBottom: 24,
       textAlign: 'center',
+    },
+    sectionTitleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginBottom: 12,
+      marginTop: 4,
     },
     sectionTitle: {
       fontSize: fontSizes.subtitle,
       fontWeight: 'bold',
       color: colors.text,
       fontFamily: 'Inter-Bold',
-      marginBottom: 12,
-      marginTop: 8,
+    },
+    featuresSurface: {
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      padding: 12,
+      gap: 10,
+      marginBottom: 22,
+      borderWidth: 1,
+      borderColor: colors.border,
     },
     featureItem: {
       flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 8,
-      paddingHorizontal: 4,
+      alignItems: 'flex-start',
+      gap: 10,
     },
     featureText: {
       fontSize: fontSizes.medium,
       color: colors.text,
       fontFamily: 'Inter-Regular',
-      marginLeft: 8,
       flex: 1,
+      lineHeight: 20,
+    },
+    stepsSurface: {
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      padding: 12,
+      gap: 12,
+      marginBottom: 22,
+      borderWidth: 1,
+      borderColor: colors.border,
     },
     stepItem: {
       flexDirection: 'row',
       alignItems: 'flex-start',
-      marginBottom: 12,
-      paddingHorizontal: 4,
+      gap: 12,
     },
     stepNumber: {
-      width: 24,
-      height: 24,
-      borderRadius: 12,
+      width: 22,
+      height: 22,
+      borderRadius: 11,
       backgroundColor: colors.primary,
       justifyContent: 'center',
       alignItems: 'center',
-      marginRight: 12,
       marginTop: 2,
     },
     stepNumberText: {
-      fontSize: fontSizes.small,
+      fontSize: 11,
       color: colors.background,
       fontFamily: 'Inter-Bold',
     },
@@ -163,38 +217,35 @@ export default function AboutAppSection() {
     },
     socialContainer: {
       flexDirection: 'row',
+      flexWrap: 'wrap',
       justifyContent: 'center',
       alignItems: 'center',
-      gap: 16,
-      marginTop: 20,
-      paddingTop: 20,
+      gap: 10,
+      paddingTop: 16,
       borderTopWidth: 1,
       borderTopColor: colors.border,
     },
     socialButton: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: colors.background,
-      paddingHorizontal: 16,
-      paddingVertical: 10,
+      backgroundColor: colors.surface,
+      paddingHorizontal: 14,
+      paddingVertical: 8,
       borderRadius: 8,
       borderWidth: 1,
       borderColor: colors.border,
-      gap: 8,
+      gap: 6,
     },
     socialButtonText: {
       fontSize: fontSizes.small,
       color: colors.text,
       fontFamily: 'Inter-Medium',
     },
-    campaignContainer: {
-      marginBottom: 16,
-    },
   });
 
   if (loading || !appInfo) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.surface }]}>
+      <View style={styles.loadingContainer}>
         <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
           {t('loading')}
         </Text>
@@ -203,76 +254,120 @@ export default function AboutAppSection() {
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Campaign Banner */}
-      {campaign && (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Campaign Banner (if active & clean) */}
+      {showCampaign && campaign && (
         <View style={styles.campaignContainer}>
           <CampaignBanner campaign={campaign} aspectRatio="1:4" />
         </View>
       )}
 
-      {/* App Title & Description */}
-      <Text style={styles.title}>{appInfo.title}</Text>
+      {/* App Title & Subtitle Badge */}
+      {/* <View style={styles.brandBadgeRow}>
+        <Chip variant="soft" color="accent" size="sm">
+          <Chip.Label>Official Trading Intelligence</Chip.Label>
+        </Chip>
+      </View> */}
+      <DigitalMorphHeading
+        text={appInfo.title}
+        characterHeight={26}
+        style={styles.title}
+        glowColor="rgba(245, 158, 11, 0.25)"
+      />
       <Text style={styles.subtitle}>{appInfo.subtitle}</Text>
-      <Text style={styles.description}>{appInfo.description}</Text>
 
-      {/* Features Section */}
-      <Text style={styles.sectionTitle}>✨ Key Features</Text>
-      {appInfo?.features?.map((feature, index) => (
-        <View key={index} style={styles.featureItem}>
-          <CheckCircle size={16} color={colors.success} />
-          <Text style={styles.featureText}>{feature}</Text>
-        </View>
-      ))}
+      {/* Description Card */}
+      <View style={styles.descriptionCard}>
+        <Text style={styles.description}>{appInfo.description}</Text>
+      </View>
 
-      {/* How to Use Section */}
-      <Text style={styles.sectionTitle}>🚀 How to Get Started</Text>
-      {appInfo?.how_to_use?.map((step, index) => (
-        <View key={index} style={styles.stepItem}>
-          <View style={styles.stepNumber}>
-            <Text style={styles.stepNumberText}>{index + 1}</Text>
+      {/* Key Features Section */}
+      <View style={styles.sectionTitleRow}>
+        <Sparkles size={18} color="#F59E0B" />
+        <DigitalMorphHeading
+          text="Key Features"
+          characterHeight={22}
+          style={styles.sectionTitle}
+        />
+      </View>
+
+      <Surface style={styles.featuresSurface}>
+        {appInfo.features.map((feature, index) => (
+          <View key={index} style={styles.featureItem}>
+            <CheckCircle size={17} color={colors.success} style={{ marginTop: 2 }} />
+            <Text style={styles.featureText}>{feature}</Text>
           </View>
-          <Text style={styles.stepText}>{step}</Text>
-        </View>
-      ))}
+        ))}
+      </Surface>
 
-      {/* Social Links */}
+      {/* How to Get Started Section */}
+      <View style={styles.sectionTitleRow}>
+        <Compass size={18} color={colors.primary} />
+        <DigitalMorphHeading
+          text="How to Get Started"
+          characterHeight={22}
+          style={styles.sectionTitle}
+        />
+      </View>
+
+      <Surface style={styles.stepsSurface}>
+        {appInfo.how_to_use.map((step, index) => (
+          <View key={index} style={styles.stepItem}>
+            <View style={styles.stepNumber}>
+              <Text style={styles.stepNumberText}>{index + 1}</Text>
+            </View>
+            <Text style={styles.stepText}>{step}</Text>
+          </View>
+        ))}
+      </Surface>
+
+      {/* Social Links & Support */}
       <View style={styles.socialContainer}>
         {appInfo.contact_email && (
-          <TouchableOpacity style={styles.socialButton} onPress={handleEmailContact}>
-            <Mail size={16} color={colors.primary} />
-            <Text style={styles.socialButtonText}>Support</Text>
-          </TouchableOpacity>
+          <Button variant="outline" size="sm" style={styles.socialButton} onPress={handleEmailContact}>
+            <Mail size={15} color={colors.primary} />
+            <Button.Label style={styles.socialButtonText}>Support</Button.Label>
+          </Button>
         )}
 
         {appInfo.telegram_url && (
-          <TouchableOpacity
+          <Button
+            variant="outline"
+            size="sm"
             style={styles.socialButton}
             onPress={() => handleSocialLink(appInfo.telegram_url, 'Telegram')}
           >
-            <MessageCircle size={16} color={colors.secondary} />
-            <Text style={styles.socialButtonText}>Telegram</Text>
-          </TouchableOpacity>
+            <MessageCircle size={15} color={colors.secondary} />
+            <Button.Label style={styles.socialButtonText}>Telegram</Button.Label>
+          </Button>
         )}
 
-        {appInfo.twitter_url && (
-          <TouchableOpacity
+        {appInfo.twitter_url && appInfo.twitter_url.startsWith('http') && (
+          <Button
+            variant="outline"
+            size="sm"
             style={styles.socialButton}
             onPress={() => handleSocialLink(appInfo.twitter_url, 'Twitter')}
           >
-            <Twitter size={16} color={colors.warning} />
-            <Text style={styles.socialButtonText}>Twitter</Text>
-          </TouchableOpacity>
+            <Twitter size={15} color={colors.warning} />
+            <Button.Label style={styles.socialButtonText}>Twitter</Button.Label>
+          </Button>
         )}
 
-        {appInfo.linkedin_url && (
-          <TouchableOpacity
+        {appInfo.linkedin_url && appInfo.linkedin_url.startsWith('http') && (
+          <Button
+            variant="outline"
+            size="sm"
             style={styles.socialButton}
             onPress={() => handleSocialLink(appInfo.linkedin_url, 'LinkedIn')}
           >
-            <Linkedin size={16} color={colors.primary} />
-            <Text style={styles.socialButtonText}>LinkedIn</Text>
-          </TouchableOpacity>
+            <Linkedin size={15} color={colors.primary} />
+            <Button.Label style={styles.socialButtonText}>LinkedIn</Button.Label>
+          </Button>
         )}
       </View>
     </ScrollView>

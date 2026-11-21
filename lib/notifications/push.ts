@@ -15,6 +15,8 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
@@ -181,7 +183,7 @@ export async function sendLocalNotification(data: PushNotificationData): Promise
 }
 
 // Create notification in database (triggers automatic push)
-export async function createPushNotification(data: PushNotificationData & { target_user?: string }): Promise<string | null> {
+export async function createPushNotification(data: PushNotificationData & { target_user?: string | null }): Promise<string | null> {
   try {
     console.log('📝 Creating push notification in database:', data.title);
 
@@ -191,7 +193,7 @@ export async function createPushNotification(data: PushNotificationData & { targ
       title: data.title,
       message: data.message,
       data: data.data,
-      target_user: data.target_user,
+      target_user: data.target_user || undefined,
     });
 
     if (notificationId) {

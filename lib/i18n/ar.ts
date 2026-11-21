@@ -2,6 +2,7 @@ export default {
   // Navigation
   home: 'الرئيسية',
   signals: 'الإشارات',
+  history: 'السجل',
   calculator: 'الحاسبة',
   settings: 'الإعدادات',
   

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, StyleSheet, Animated } from 'react-native';
+import { Button, Card, PressableFeedback, Text } from 'heroui-native';
 import { Wifi, WifiOff, RefreshCw, Database, Globe } from 'lucide-react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { testSupabaseConnection } from '../lib/supabase';
@@ -158,33 +159,36 @@ export default function ConnectionStatus() {
   });
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity 
-        style={styles.header}
+    <Card style={styles.container}>
+      <PressableFeedback 
         onPress={() => setShowDetails(!showDetails)}
-        activeOpacity={0.7}
       >
-        <View style={styles.iconContainer}>
-          <statusInfo.icon size={18} color={statusInfo.color} />
-        </View>
-        
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>{statusInfo.title}</Text>
-          <Text style={styles.subtitle}>{statusInfo.subtitle}</Text>
-        </View>
+        <View style={styles.header}>
+          <View style={styles.iconContainer}>
+            <statusInfo.icon size={18} color={statusInfo.color} />
+          </View>
+          
+          <View style={styles.textContainer}>
+            <Text style={styles.title}>{statusInfo.title}</Text>
+            <Text style={styles.subtitle}>{statusInfo.subtitle}</Text>
+          </View>
 
-        <View style={styles.actions}>
-          <TouchableOpacity 
-            style={styles.retryButton} 
-            onPress={checkConnection}
-            disabled={isChecking}
-          >
-            <Animated.View style={{ transform: [{ rotate: spin }] }}>
-              <RefreshCw size={16} color={colors.textSecondary} />
-            </Animated.View>
-          </TouchableOpacity>
+          <View style={styles.actions}>
+            <Button 
+              isIconOnly
+              size="sm"
+              variant="ghost"
+              style={styles.retryButton} 
+              onPress={checkConnection}
+              isDisabled={isChecking}
+            >
+              <Animated.View style={{ transform: [{ rotate: spin }] }}>
+                <RefreshCw size={16} color={colors.textSecondary} />
+              </Animated.View>
+            </Button>
+          </View>
         </View>
-      </TouchableOpacity>
+      </PressableFeedback>
 
       {showDetails && (
         <View style={styles.details}>
@@ -208,6 +212,6 @@ export default function ConnectionStatus() {
           </View>
         </View>
       )}
-    </View>
+    </Card>
   );
 }

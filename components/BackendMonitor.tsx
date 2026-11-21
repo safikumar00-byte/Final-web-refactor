@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
-  ActivityIndicator,
   Alert,
 } from 'react-native';
+import { Button, Card, Spinner, Text } from 'heroui-native';
 import { Database, RefreshCw, TrendingUp, Clock, CircleCheck as CheckCircle, CircleAlert as AlertCircle, Play, ChartBar as BarChart3 } from 'lucide-react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import {
@@ -273,7 +271,7 @@ export default function BackendMonitor() {
     return (
       <View style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <Spinner size="lg" />
           <Text style={styles.loadingText}>Loading backend status...</Text>
         </View>
       </View>
@@ -284,16 +282,16 @@ export default function BackendMonitor() {
   const statusColor = systemStatus ? getStatusColor(systemStatus.system_health) : colors.textSecondary;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <Card style={styles.container}>
+      <Card.Header style={[styles.header, { padding: 0 }]}>
         <View style={styles.headerIcon}>
           <Database size={18} color={colors.primary} />
         </View>
         <Text style={styles.title}>Backend Monitor</Text>
-        <TouchableOpacity style={styles.refreshButton} onPress={loadData}>
+        <Button isIconOnly size="sm" variant="ghost" style={styles.refreshButton} onPress={loadData}>
           <RefreshCw size={16} color={colors.textSecondary} />
-        </TouchableOpacity>
-      </View>
+        </Button>
+      </Card.Header>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* System Status */}
@@ -330,53 +328,59 @@ export default function BackendMonitor() {
         <View style={styles.triggerSection}>
           <Text style={styles.triggerTitle}>Manual Triggers</Text>
           <View style={styles.triggerButtons}>
-            <TouchableOpacity
+            <Button
+              size="sm"
+              variant="outline"
               style={[
                 styles.triggerButton,
                 triggering === 'signals' && styles.triggerButtonDisabled,
               ]}
               onPress={() => handleManualTrigger('signals')}
-              disabled={!!triggering}
+              isDisabled={!!triggering}
             >
               {triggering === 'signals' ? (
-                <ActivityIndicator size="small" color={colors.background} />
+                <Spinner size="sm" />
               ) : (
                 <TrendingUp size={14} color={colors.background} />
               )}
-              <Text style={styles.triggerButtonText}>Signals</Text>
-            </TouchableOpacity>
+              <Button.Label style={styles.triggerButtonText}>Signals</Button.Label>
+            </Button>
 
-            <TouchableOpacity
+            <Button
+              size="sm"
+              variant="outline"
               style={[
                 styles.triggerButton,
                 triggering === 'indicators' && styles.triggerButtonDisabled,
               ]}
               onPress={() => handleManualTrigger('indicators')}
-              disabled={!!triggering}
+              isDisabled={!!triggering}
             >
               {triggering === 'indicators' ? (
-                <ActivityIndicator size="small" color={colors.background} />
+                <Spinner size="sm" />
               ) : (
                 <BarChart3 size={14} color={colors.background} />
               )}
-              <Text style={styles.triggerButtonText}>Indicators</Text>
-            </TouchableOpacity>
+              <Button.Label style={styles.triggerButtonText}>Indicators</Button.Label>
+            </Button>
 
-            <TouchableOpacity
+            <Button
+              size="sm"
+              variant="outline"
               style={[
                 styles.triggerButton,
                 triggering === 'both' && styles.triggerButtonDisabled,
               ]}
               onPress={() => handleManualTrigger('both')}
-              disabled={!!triggering}
+              isDisabled={!!triggering}
             >
               {triggering === 'both' ? (
-                <ActivityIndicator size="small" color={colors.background} />
+                <Spinner size="sm" />
               ) : (
                 <Play size={14} color={colors.background} />
               )}
-              <Text style={styles.triggerButtonText}>Both</Text>
-            </TouchableOpacity>
+              <Button.Label style={styles.triggerButtonText}>Both</Button.Label>
+            </Button>
           </View>
         </View>
 
@@ -403,6 +407,6 @@ export default function BackendMonitor() {
           </View>
         )}
       </ScrollView>
-    </View>
+    </Card>
   );
 }

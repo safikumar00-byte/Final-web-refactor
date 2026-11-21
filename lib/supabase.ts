@@ -5,7 +5,7 @@ const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://demo-proje
 const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'demo-anon-key';
 
 // Create a safe fetch function that handles missing environment variables
-const safeFetch = async (url: string, options: any) => {
+const safeFetch: typeof fetch = async (url: any, options: any = {}) => {
   // If using demo values, return mock data instead of making real requests
   if (SUPABASE_URL.includes('demo-project') || SUPABASE_ANON_KEY === 'demo-anon-key') {
     console.log('Using demo mode - no real Supabase connection');

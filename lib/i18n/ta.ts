@@ -2,6 +2,7 @@ export default {
   // Navigation
   home: 'முகப்பு',
   signals: 'சிக்னல்கள்',
+  history: 'வரலாறு',
   calculator: 'கணிப்பான்',
   settings: 'அமைப்புகள்',
   

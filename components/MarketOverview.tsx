@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { Card, Text } from 'heroui-native';
 import { TrendingUp, TrendingDown } from 'lucide-react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { fetchMarketData, subscribeToMarketData, MarketData } from '../lib/database';
+import MarketOverviewSkeleton from './skeletons/MarketOverviewSkeleton';
+import DigitalMorphHeading from './DigitalMorphHeading';
+import DigitalOdometer from './DigitalOdometer';
 
 export default function MarketOverview() {
   const { colors, fontSizes } = useTheme();
@@ -22,33 +26,40 @@ export default function MarketOverview() {
       setLoading(false);
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   const renderMarketItem = (item: MarketData) => (
-    <View key={item.id} style={styles.marketItem}>
-      <Text style={styles.pairText}>{item.pair}</Text>
-      <View style={styles.priceContainer}>
-        <Text style={styles.priceText}>
-          {item.pair.includes('XAU') || item.pair.includes('XAG')
-            ? item.price.toFixed(2)
-            : item.price.toFixed(4)}
-        </Text>
-        <View style={styles.changeContainer}>
-          {item.change >= 0 ? (
-            <TrendingUp size={12} color={colors.success} />
-          ) : (
-            <TrendingDown size={12} color={colors.error} />
-          )}
-          <Text style={[
-            styles.changeText,
-            item.change >= 0 ? styles.profitText : styles.lossText
-          ]}>
-            {item.change >= 0 ? '+' : ''}{item.change_percent.toFixed(2)}%
-          </Text>
+    <Card key={item.id} style={styles.marketItem}>
+      <Card.Body style={{ padding: 0 }}>
+        <Text style={styles.pairText}>{item.pair}</Text>
+        <View style={styles.priceContainer}>
+          <DigitalOdometer
+            value={item.pair.includes('XAU') || item.pair.includes('XAG')
+              ? item.price.toFixed(2)
+              : item.price.toFixed(4)}
+            prefix="$"
+            digitHeight={18}
+            textStyle={styles.priceText}
+          />
+          <View style={styles.changeContainer}>
+            {item.change >= 0 ? (
+              <TrendingUp size={12} color={colors.success} />
+            ) : (
+              <TrendingDown size={12} color={colors.error} />
+            )}
+            <Text style={[
+              styles.changeText,
+              item.change >= 0 ? styles.profitText : styles.lossText
+            ]}>
+              {item.change >= 0 ? '+' : ''}{item.change_percent.toFixed(2)}%
+            </Text>
+          </View>
         </View>
-      </View>
-    </View>
+      </Card.Body>
+    </Card>
   );
 
   const styles = StyleSheet.create({
@@ -113,19 +124,16 @@ export default function MarketOverview() {
   });
 
   if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Market Overview</Text>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="small" color={colors.primary} />
-        </View>
-      </View>
-    );
+    return <MarketOverviewSkeleton />;
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Market Overview</Text>
+      <DigitalMorphHeading
+        text="Market Overview"
+        characterHeight={22}
+        style={styles.title}
+      />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}

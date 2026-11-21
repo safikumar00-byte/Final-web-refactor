@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Text,
-  TextInput,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Button, Card, Input, Label, PressableFeedback, Surface, Text } from 'heroui-native';
 import { Calculator, TrendingUp, DollarSign, Target, ChevronDown } from 'lucide-react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -22,6 +20,8 @@ import {
   LotSizeResult,
   PnLResult,
 } from '../../lib/forex';
+import DigitalMorphHeading from '../../components/DigitalMorphHeading';
+import DigitalOdometer from '../../components/DigitalOdometer';
 
 type CalculatorTab = 'pip' | 'lot' | 'pnl';
 
@@ -355,292 +355,357 @@ export default function CalculatorScreen() {
   });
 
   const renderPipCalculator = () => (
-    <View style={styles.calculatorCard}>
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>{t('tradeType')}</Text>
-        <View style={styles.typeSelector}>
-          <TouchableOpacity
-            style={[
-              styles.typeButton,
-              pipData.type === 'BUY' && styles.typeButtonActive,
-            ]}
-            onPress={() => setPipData(prev => ({ ...prev, type: 'BUY' }))}
-          >
-            <Text style={[
-              styles.typeButtonText,
-              pipData.type === 'BUY' && styles.typeButtonTextActive,
-            ]}>
-              {t('buy')}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.typeButton,
-              pipData.type === 'SELL' && styles.typeButtonActive,
-            ]}
-            onPress={() => setPipData(prev => ({ ...prev, type: 'SELL' }))}
-          >
-            <Text style={[
-              styles.typeButtonText,
-              pipData.type === 'SELL' && styles.typeButtonTextActive,
-            ]}>
-              {t('sell')}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>{t('entryPrice')}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter entry price"
-          placeholderTextColor={colors.textSecondary}
-          keyboardType="numeric"
-          value={pipData.entryPrice}
-          onChangeText={(text) => setPipData(prev => ({ ...prev, entryPrice: text }))}
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Exit Price</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter exit price"
-          placeholderTextColor={colors.textSecondary}
-          keyboardType="numeric"
-          value={pipData.exitPrice}
-          onChangeText={(text) => setPipData(prev => ({ ...prev, exitPrice: text }))}
-        />
-      </View>
-
-      <TouchableOpacity style={styles.calculateButton} onPress={calculatePipValue}>
-        <Text style={styles.calculateButtonText}>{t('calculatePips')}</Text>
-      </TouchableOpacity>
-
-      {pipResult && (
-        <View style={[styles.resultCard, pipResult.totalPips < 0 && styles.resultCardNegative]}>
-          <Text style={styles.resultTitle}>Pip Calculation Result</Text>
-          <View style={styles.resultRow}>
-            <Text style={styles.resultLabel}>{t('totalPips')}:</Text>
-            <Text style={[styles.resultValue, pipResult.totalPips < 0 && { color: colors.error }]}>
-              {pipResult.totalPips}
-            </Text>
-          </View>
-          <View style={styles.resultRow}>
-            <Text style={styles.resultLabel}>{t('pipValue')}:</Text>
-            <Text style={styles.resultValue}>{pipResult.pipValue}</Text>
-          </View>
-          <View style={styles.resultRow}>
-            <Text style={styles.resultLabel}>{t('priceDifference')}:</Text>
-            <Text style={[styles.resultValue, pipResult.profit < 0 && { color: colors.error }]}>
-              ${pipResult.profit.toFixed(2)}
-            </Text>
+    <Card style={styles.calculatorCard}>
+      <Card.Body style={{ padding: 0 }}>
+        <View style={styles.inputGroup}>
+          <Label style={styles.label}>{t('tradeType')}</Label>
+          <View style={styles.typeSelector}>
+            <Button
+              variant={pipData.type === 'BUY' ? 'primary' : 'outline'}
+              style={[
+                styles.typeButton,
+                pipData.type === 'BUY' && styles.typeButtonActive,
+              ]}
+              onPress={() => setPipData(prev => ({ ...prev, type: 'BUY' }))}
+            >
+              <Button.Label
+                style={[
+                  styles.typeButtonText,
+                  pipData.type === 'BUY' && styles.typeButtonTextActive,
+                ]}
+              >
+                {t('buy')}
+              </Button.Label>
+            </Button>
+            <Button
+              variant={pipData.type === 'SELL' ? 'primary' : 'outline'}
+              style={[
+                styles.typeButton,
+                pipData.type === 'SELL' && styles.typeButtonActive,
+              ]}
+              onPress={() => setPipData(prev => ({ ...prev, type: 'SELL' }))}
+            >
+              <Button.Label
+                style={[
+                  styles.typeButtonText,
+                  pipData.type === 'SELL' && styles.typeButtonTextActive,
+                ]}
+              >
+                {t('sell')}
+              </Button.Label>
+            </Button>
           </View>
         </View>
-      )}
-    </View>
+
+        <View style={styles.inputGroup}>
+          <Label style={styles.label}>{t('entryPrice')}</Label>
+          <Input
+            style={styles.input}
+            placeholder="Enter entry price"
+            placeholderTextColor={colors.textSecondary}
+            keyboardType="numeric"
+            value={pipData.entryPrice}
+            onChangeText={(text) => setPipData(prev => ({ ...prev, entryPrice: text }))}
+          />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Label style={styles.label}>Exit Price</Label>
+          <Input
+            style={styles.input}
+            placeholder="Enter exit price"
+            placeholderTextColor={colors.textSecondary}
+            keyboardType="numeric"
+            value={pipData.exitPrice}
+            onChangeText={(text) => setPipData(prev => ({ ...prev, exitPrice: text }))}
+          />
+        </View>
+
+        <Button variant="primary" style={styles.calculateButton} onPress={calculatePipValue}>
+          <Button.Label style={styles.calculateButtonText}>{t('calculatePips')}</Button.Label>
+        </Button>
+
+        {pipResult && (
+          <Card style={[styles.resultCard, pipResult.totalPips < 0 && styles.resultCardNegative, { marginTop: 16 }]}>
+            <Card.Body style={{ padding: 0 }}>
+              <Text style={styles.resultTitle}>Pip Calculation Result</Text>
+              <View style={styles.resultRow}>
+                <Text style={styles.resultLabel}>{t('totalPips')}:</Text>
+                <DigitalOdometer
+                  value={Math.abs(pipResult.totalPips).toFixed(1)}
+                  prefix={pipResult.totalPips >= 0 ? "+" : "-"}
+                  digitHeight={18}
+                  textStyle={[styles.resultValue, pipResult.totalPips < 0 && { color: colors.error }]}
+                />
+              </View>
+              <View style={styles.resultRow}>
+                <Text style={styles.resultLabel}>{t('pipValue')}:</Text>
+                <Text style={styles.resultValue}>{pipResult.pipValue}</Text>
+              </View>
+              <View style={styles.resultRow}>
+                <Text style={styles.resultLabel}>{t('priceDifference')}:</Text>
+                <DigitalOdometer
+                  value={Math.abs(pipResult.profit).toFixed(2)}
+                  prefix={pipResult.profit >= 0 ? "+$" : "-$"}
+                  digitHeight={18}
+                  textStyle={[styles.resultValue, pipResult.profit < 0 && { color: colors.error }]}
+                />
+              </View>
+            </Card.Body>
+          </Card>
+        )}
+      </Card.Body>
+    </Card>
   );
 
   const renderLotSizeCalculator = () => (
-    <View style={styles.calculatorCard}>
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Account Balance ($)</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter account balance"
-          placeholderTextColor={colors.textSecondary}
-          keyboardType="numeric"
-          value={lotData.accountBalance}
-          onChangeText={(text) => setLotData(prev => ({ ...prev, accountBalance: text }))}
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Risk Percentage (%)</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter risk percentage"
-          placeholderTextColor={colors.textSecondary}
-          keyboardType="numeric"
-          value={lotData.riskPercent}
-          onChangeText={(text) => setLotData(prev => ({ ...prev, riskPercent: text }))}
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Stop Loss (Pips)</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter stop loss in pips"
-          placeholderTextColor={colors.textSecondary}
-          keyboardType="numeric"
-          value={lotData.stopLossPips}
-          onChangeText={(text) => setLotData(prev => ({ ...prev, stopLossPips: text }))}
-        />
-      </View>
-
-      <TouchableOpacity style={styles.calculateButton} onPress={calculateLotSizeValue}>
-        <Text style={styles.calculateButtonText}>{t('calculateLotSize')}</Text>
-      </TouchableOpacity>
-
-      {lotResult && (
-        <View style={[styles.resultCard, lotResult.lotSize < 0 && styles.resultCardNegative]}>
-          <Text style={styles.resultTitle}>Lot Size Calculation</Text>
-          <View style={styles.resultRow}>
-            <Text style={styles.resultLabel}>{t('recommendedLotSize')}:</Text>
-            <Text style={styles.resultValue}>{lotResult.lotSize}</Text>
-          </View>
-          <View style={styles.resultRow}>
-            <Text style={styles.resultLabel}>{t('positionSize')}:</Text>
-            <Text style={styles.resultValue}>{lotResult.positionSize.toLocaleString()}</Text>
-          </View>
-          <View style={styles.resultRow}>
-            <Text style={styles.resultLabel}>{t('riskAmount')}:</Text>
-            <Text style={styles.resultValue}>${lotResult.margin.toFixed(2)}</Text>
-          </View>
+    <Card style={styles.calculatorCard}>
+      <Card.Body style={{ padding: 0 }}>
+        <View style={styles.inputGroup}>
+          <Label style={styles.label}>Account Balance ($)</Label>
+          <Input
+            style={styles.input}
+            placeholder="Enter account balance"
+            placeholderTextColor={colors.textSecondary}
+            keyboardType="numeric"
+            value={lotData.accountBalance}
+            onChangeText={(text) => setLotData(prev => ({ ...prev, accountBalance: text }))}
+          />
         </View>
-      )}
-    </View>
+
+        <View style={styles.inputGroup}>
+          <Label style={styles.label}>Risk Percentage (%)</Label>
+          <Input
+            style={styles.input}
+            placeholder="Enter risk percentage"
+            placeholderTextColor={colors.textSecondary}
+            keyboardType="numeric"
+            value={lotData.riskPercent}
+            onChangeText={(text) => setLotData(prev => ({ ...prev, riskPercent: text }))}
+          />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Label style={styles.label}>Stop Loss (Pips)</Label>
+          <Input
+            style={styles.input}
+            placeholder="Enter stop loss in pips"
+            placeholderTextColor={colors.textSecondary}
+            keyboardType="numeric"
+            value={lotData.stopLossPips}
+            onChangeText={(text) => setLotData(prev => ({ ...prev, stopLossPips: text }))}
+          />
+        </View>
+
+        <Button variant="primary" style={styles.calculateButton} onPress={calculateLotSizeValue}>
+          <Button.Label style={styles.calculateButtonText}>{t('calculateLotSize')}</Button.Label>
+        </Button>
+
+        {lotResult && (
+          <Card style={[styles.resultCard, lotResult.lotSize < 0 && styles.resultCardNegative, { marginTop: 16 }]}>
+            <Card.Body style={{ padding: 0 }}>
+              <Text style={styles.resultTitle}>Lot Size Calculation</Text>
+              <View style={styles.resultRow}>
+                <Text style={styles.resultLabel}>{t('recommendedLotSize')}:</Text>
+                <DigitalOdometer
+                  value={lotResult.lotSize.toFixed(2)}
+                  digitHeight={18}
+                  textStyle={styles.resultValue}
+                />
+              </View>
+              <View style={styles.resultRow}>
+                <Text style={styles.resultLabel}>{t('positionSize')}:</Text>
+                <DigitalOdometer
+                  value={lotResult.positionSize.toLocaleString()}
+                  digitHeight={18}
+                  textStyle={styles.resultValue}
+                />
+              </View>
+              <View style={styles.resultRow}>
+                <Text style={styles.resultLabel}>{t('riskAmount')}:</Text>
+                <DigitalOdometer
+                  value={lotResult.margin.toFixed(2)}
+                  prefix="$"
+                  digitHeight={18}
+                  textStyle={styles.resultValue}
+                />
+              </View>
+            </Card.Body>
+          </Card>
+        )}
+      </Card.Body>
+    </Card>
   );
 
   const renderPnLCalculator = () => (
-    <View style={styles.calculatorCard}>
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>{t('tradeType')}</Text>
-        <View style={styles.typeSelector}>
-          <TouchableOpacity
-            style={[
-              styles.typeButton,
-              pnlData.type === 'BUY' && styles.typeButtonActive,
-            ]}
-            onPress={() => setPnlData(prev => ({ ...prev, type: 'BUY' }))}
-          >
-            <Text style={[
-              styles.typeButtonText,
-              pnlData.type === 'BUY' && styles.typeButtonTextActive,
-            ]}>
-              {t('buy')}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.typeButton,
-              pnlData.type === 'SELL' && styles.typeButtonActive,
-            ]}
-            onPress={() => setPnlData(prev => ({ ...prev, type: 'SELL' }))}
-          >
-            <Text style={[
-              styles.typeButtonText,
-              pnlData.type === 'SELL' && styles.typeButtonTextActive,
-            ]}>
-              {t('sell')}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Lot Size</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter lot size"
-          placeholderTextColor={colors.textSecondary}
-          keyboardType="numeric"
-          value={pnlData.lotSize}
-          onChangeText={(text) => setPnlData(prev => ({ ...prev, lotSize: text }))}
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>{t('entryPrice')}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter entry price"
-          placeholderTextColor={colors.textSecondary}
-          keyboardType="numeric"
-          value={pnlData.entryPrice}
-          onChangeText={(text) => setPnlData(prev => ({ ...prev, entryPrice: text }))}
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Exit Price</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter exit price"
-          placeholderTextColor={colors.textSecondary}
-          keyboardType="numeric"
-          value={pnlData.exitPrice}
-          onChangeText={(text) => setPnlData(prev => ({ ...prev, exitPrice: text }))}
-        />
-      </View>
-
-      <TouchableOpacity style={styles.calculateButton} onPress={calculatePnLValue}>
-        <Text style={styles.calculateButtonText}>{t('calculatePnl')}</Text>
-      </TouchableOpacity>
-
-      {pnlResult && (
-        <View style={[styles.resultCard, pnlResult.profitPercent < 0 && styles.resultCardNegative]}>
-          <Text style={styles.resultTitle}>P&L Calculation Result</Text>
-          <View style={styles.resultRow}>
-            <Text style={styles.resultLabel}>{t('profitLoss')}:</Text>
-            <Text style={[
-              styles.resultValue,
-              { color: pnlResult.profit >= 0 ? colors.success : colors.error }
-            ]}>
-              ${pnlResult.profit}
-            </Text>
-          </View>
-          <View style={styles.resultRow}>
-            <Text style={styles.resultLabel}>{t('profitPercent')}:</Text>
-            <Text style={[
-              styles.resultValue,
-              { color: pnlResult.profitPercent >= 0 ? colors.success : colors.error }
-            ]}>
-              {pnlResult.profitPercent}%
-            </Text>
-          </View>
-          <View style={styles.resultRow}>
-            <Text style={styles.resultLabel}>{t('pips')}:</Text>
-            <Text style={styles.resultValue}>{pnlResult.pips}</Text>
+    <Card style={styles.calculatorCard}>
+      <Card.Body style={{ padding: 0 }}>
+        <View style={styles.inputGroup}>
+          <Label style={styles.label}>{t('tradeType')}</Label>
+          <View style={styles.typeSelector}>
+            <Button
+              variant={pnlData.type === 'BUY' ? 'primary' : 'outline'}
+              style={[
+                styles.typeButton,
+                pnlData.type === 'BUY' && styles.typeButtonActive,
+              ]}
+              onPress={() => setPnlData(prev => ({ ...prev, type: 'BUY' }))}
+            >
+              <Button.Label
+                style={[
+                  styles.typeButtonText,
+                  pnlData.type === 'BUY' && styles.typeButtonTextActive,
+                ]}
+              >
+                {t('buy')}
+              </Button.Label>
+            </Button>
+            <Button
+              variant={pnlData.type === 'SELL' ? 'primary' : 'outline'}
+              style={[
+                styles.typeButton,
+                pnlData.type === 'SELL' && styles.typeButtonActive,
+              ]}
+              onPress={() => setPnlData(prev => ({ ...prev, type: 'SELL' }))}
+            >
+              <Button.Label
+                style={[
+                  styles.typeButtonText,
+                  pnlData.type === 'SELL' && styles.typeButtonTextActive,
+                ]}
+              >
+                {t('sell')}
+              </Button.Label>
+            </Button>
           </View>
         </View>
-      )}
-    </View>
+
+        <View style={styles.inputGroup}>
+          <Label style={styles.label}>Lot Size</Label>
+          <Input
+            style={styles.input}
+            placeholder="Enter lot size"
+            placeholderTextColor={colors.textSecondary}
+            keyboardType="numeric"
+            value={pnlData.lotSize}
+            onChangeText={(text) => setPnlData(prev => ({ ...prev, lotSize: text }))}
+          />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Label style={styles.label}>{t('entryPrice')}</Label>
+          <Input
+            style={styles.input}
+            placeholder="Enter entry price"
+            placeholderTextColor={colors.textSecondary}
+            keyboardType="numeric"
+            value={pnlData.entryPrice}
+            onChangeText={(text) => setPnlData(prev => ({ ...prev, entryPrice: text }))}
+          />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Label style={styles.label}>Exit Price</Label>
+          <Input
+            style={styles.input}
+            placeholder="Enter exit price"
+            placeholderTextColor={colors.textSecondary}
+            keyboardType="numeric"
+            value={pnlData.exitPrice}
+            onChangeText={(text) => setPnlData(prev => ({ ...prev, exitPrice: text }))}
+          />
+        </View>
+
+        <Button variant="primary" style={styles.calculateButton} onPress={calculatePnLValue}>
+          <Button.Label style={styles.calculateButtonText}>{t('calculatePnl')}</Button.Label>
+        </Button>
+
+        {pnlResult && (
+          <Card style={[styles.resultCard, pnlResult.profitPercent < 0 && styles.resultCardNegative, { marginTop: 16 }]}>
+            <Card.Body style={{ padding: 0 }}>
+              <Text style={styles.resultTitle}>P&L Calculation Result</Text>
+              <View style={styles.resultRow}>
+                <Text style={styles.resultLabel}>{t('profitLoss')}:</Text>
+                <DigitalOdometer
+                  value={Math.abs(pnlResult.profit).toFixed(2)}
+                  prefix={pnlResult.profit >= 0 ? "+$" : "-$"}
+                  digitHeight={18}
+                  textStyle={[
+                    styles.resultValue,
+                    { color: pnlResult.profit >= 0 ? colors.success : colors.error }
+                  ]}
+                />
+              </View>
+              <View style={styles.resultRow}>
+                <Text style={styles.resultLabel}>{t('profitPercent')}:</Text>
+                <DigitalOdometer
+                  value={Math.abs(pnlResult.profitPercent).toFixed(2)}
+                  prefix={pnlResult.profitPercent >= 0 ? "+" : "-"}
+                  suffix="%"
+                  digitHeight={18}
+                  textStyle={[
+                    styles.resultValue,
+                    { color: pnlResult.profitPercent >= 0 ? colors.success : colors.error }
+                  ]}
+                />
+              </View>
+              <View style={styles.resultRow}>
+                <Text style={styles.resultLabel}>{t('pips')}:</Text>
+                <DigitalOdometer
+                  value={Math.abs(pnlResult.pips).toFixed(1)}
+                  prefix={pnlResult.pips >= 0 ? "+" : "-"}
+                  digitHeight={18}
+                  textStyle={styles.resultValue}
+                />
+              </View>
+            </Card.Body>
+          </Card>
+        )}
+      </Card.Body>
+    </Card>
   );
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>{t('calculatorTitle')}</Text>
+        <DigitalMorphHeading
+          text={t('calculatorTitle')}
+          characterHeight={30}
+          style={styles.title}
+          glowColor="rgba(245, 158, 11, 0.25)"
+        />
 
-        <TouchableOpacity
-          style={styles.pairSelector}
+        <PressableFeedback
           onPress={() => setShowPairPicker(true)}
         >
-          <Text style={styles.pairText}>{selectedPair}</Text>
+          <Surface style={styles.pairSelector}>
+            <Text style={styles.pairText}>{selectedPair}</Text>
 
-          {loading ? (
-            <Text style={styles.livePrice}>{t('loading')}</Text>
-          ) : livePrice !== null ? (
-            <Text style={styles.livePrice}>
-              ${livePrice.toFixed(2)}
-            </Text>
-          ) : (
-            <Text style={[styles.livePrice, { color: colors.textSecondary }]}>
-              {t('priceUnavailable')}
-            </Text>
-          )}
+            {loading ? (
+              <Text style={styles.livePrice}>{t('loading')}</Text>
+            ) : livePrice !== null ? (
+              <DigitalOdometer
+                value={livePrice.toFixed(2)}
+                prefix="$"
+                digitHeight={18}
+                textStyle={styles.livePrice}
+              />
+            ) : (
+              <Text style={[styles.livePrice, { color: colors.textSecondary }]}>
+                {t('priceUnavailable')}
+              </Text>
+            )}
 
-          <ChevronDown size={20} color={colors.textSecondary} />
-        </TouchableOpacity>
+            <ChevronDown size={20} color={colors.textSecondary} />
+          </Surface>
+        </PressableFeedback>
       </View>
 
       <View style={styles.tabContainer}>
         {tabs.map((tab) => (
-          <TouchableOpacity
+          <Button
             key={tab.id}
+            variant={activeTab === tab.id ? 'primary' : 'ghost'}
             style={[styles.tab, activeTab === tab.id && styles.tabActive]}
             onPress={() => setActiveTab(tab.id)}
           >
@@ -648,13 +713,13 @@ export default function CalculatorScreen() {
               size={16}
               color={activeTab === tab.id ? colors.background : colors.textSecondary}
             />
-            <Text style={[
+            <Button.Label style={[
               styles.tabText,
               activeTab === tab.id && styles.tabTextActive,
             ]}>
               {tab.title}
-            </Text>
-          </TouchableOpacity>
+            </Button.Label>
+          </Button>
         ))}
       </View>
 
@@ -667,25 +732,26 @@ export default function CalculatorScreen() {
       {/* Pair Picker Modal */}
       {showPairPicker && (
         <View style={styles.modal}>
-          <View style={styles.modalContent}>
+          <Card style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Select Trading Pair</Text>
             </View>
             <ScrollView>
               {SUPPORTED_PAIRS.map((pair) => (
-                <TouchableOpacity
+                <PressableFeedback
                   key={pair}
-                  style={styles.pairOption}
                   onPress={() => {
                     setSelectedPair(pair);
                     setShowPairPicker(false);
                   }}
                 >
-                  <Text style={styles.pairOptionText}>{pair}</Text>
-                </TouchableOpacity>
+                  <Surface style={styles.pairOption}>
+                    <Text style={styles.pairOptionText}>{pair}</Text>
+                  </Surface>
+                </PressableFeedback>
               ))}
             </ScrollView>
-          </View>
+          </Card>
         </View>
       )}
     </SafeAreaView>

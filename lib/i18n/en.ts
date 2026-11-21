@@ -2,6 +2,7 @@ export default {
   // Navigation
   home: 'Home',
   signals: 'Signals',
+  history: 'History',
   calculator: 'Calculator',
   settings: 'Settings',
 
@@ -50,7 +51,7 @@ export default {
   calculatorTitle: 'Trading Calculators',
   pipCalculator: 'Pip Calculator',
   lotSize: 'Lot Size',
-  pnlCalculator: 'P&L Calculator',
+  pnlCalculator: 'Profit & Loss',
   tradeType: 'Trade Type',
   buy: 'BUY',
   sell: 'SELL',

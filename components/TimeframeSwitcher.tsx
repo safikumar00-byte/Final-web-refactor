@@ -1,6 +1,7 @@
 // TimeframeSwitcher.tsx
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { Button } from 'heroui-native';
 import { useTheme } from '../contexts/ThemeContext';
 
 interface TimeframeSwitcherProps {
@@ -24,8 +25,6 @@ export default function TimeframeSwitcher({
       paddingHorizontal: 20,
     },
     timeframeButton: {
-      paddingHorizontal: 16,
-      paddingVertical: 8,
       borderRadius: 16,
       backgroundColor: colors.surface,
       borderWidth: 1,
@@ -54,23 +53,25 @@ export default function TimeframeSwitcher({
         contentContainerStyle={styles.scrollContainer}
       >
         {timeframes.map((timeframe) => (
-          <TouchableOpacity
+          <Button
             key={timeframe}
+            size="sm"
+            variant={selectedTimeframe === timeframe ? 'primary' : 'outline'}
             style={[
               styles.timeframeButton,
               selectedTimeframe === timeframe && styles.timeframeButtonActive,
             ]}
             onPress={() => onTimeframeChange(timeframe)}
           >
-            <Text
+            <Button.Label
               style={[
                 styles.timeframeText,
                 selectedTimeframe === timeframe && styles.timeframeTextActive,
               ]}
             >
               {timeframe}
-            </Text>
-          </TouchableOpacity>
+            </Button.Label>
+          </Button>
         ))}
       </ScrollView>
     </View>

@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   Alert,
   Share,
   Platform,
@@ -13,6 +11,7 @@ import {
   Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Button, Card, PressableFeedback, Surface, Text } from 'heroui-native';
 import { Bell, Shield, CircleHelp as HelpCircle, Settings, ChevronRight, Share2, Moon, Sun, Type, Smartphone, Database, Globe, Check, X } from 'lucide-react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -25,6 +24,7 @@ import { silentNotificationHandler } from '../../lib/notifications';
 import { backgroundSyncManager } from '../../lib/backgroundSyncManager';
 import { supabase } from '@/lib/supabase';
 import { getFCMToken } from '@/lib/notifications';
+import DigitalMorphHeading from '../../components/DigitalMorphHeading';
 
 
 export default function SettingsScreen() {
@@ -171,19 +171,20 @@ export default function SettingsScreen() {
   ];
 
   const renderMenuItem = (item: any) => (
-    <TouchableOpacity
+    <PressableFeedback
       key={item.id}
-      style={styles.menuItem}
       onPress={item.onPress}
     >
-      <View style={styles.menuItemLeft}>
-        <View style={[styles.menuIconContainer, { backgroundColor: `${item.color}20` }]}>
-          <item.icon size={20} color={item.color} />
+      <View style={styles.menuItem}>
+        <View style={styles.menuItemLeft}>
+          <View style={[styles.menuIconContainer, { backgroundColor: `${item.color}20` }]}>
+            <item.icon size={20} color={item.color} />
+          </View>
+          <Text style={styles.menuItemText}>{item.title}</Text>
         </View>
-        <Text style={styles.menuItemText}>{item.title}</Text>
+        <ChevronRight size={20} color={colors.textSecondary} />
       </View>
-      <ChevronRight size={20} color={colors.textSecondary} />
-    </TouchableOpacity>
+    </PressableFeedback>
   );
 
   const styles = StyleSheet.create({
@@ -520,7 +521,12 @@ export default function SettingsScreen() {
 
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>{t('settingsTitle')}</Text>
+          <DigitalMorphHeading
+            text={t('settingsTitle')}
+            characterHeight={30}
+            style={styles.title}
+            glowColor="rgba(245, 158, 11, 0.25)"
+          />
           <Text style={styles.subtitle}>{t('settingsSubtitle')}</Text>
         </View>
 
@@ -529,23 +535,28 @@ export default function SettingsScreen() {
 
         {/* App Preferences */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('preferences')}</Text>
+          <DigitalMorphHeading
+            text={t('preferences')}
+            characterHeight={24}
+            style={styles.sectionTitle}
+          />
           {/* <Text>Status: {isEnabled ? "Enabled" : "Not Enabled"}</Text> */}
 
 
           {/* Language Selection */}
-          <TouchableOpacity
-            style={styles.settingItem}
+          <PressableFeedback
             onPress={() => setShowLanguagePicker(true)}
           >
-            <View style={styles.settingLeft}>
-              <Globe size={20} color={colors.secondary} />
-              <Text style={styles.settingText}>{t('language')}</Text>
-            </View>
-            <Text style={styles.settingValue}>
-              {currentLanguageInfo.flag} {currentLanguageInfo.name}
-            </Text>
-          </TouchableOpacity>
+            <Surface style={styles.settingItem}>
+              <View style={styles.settingLeft}>
+                <Globe size={20} color={colors.secondary} />
+                <Text style={styles.settingText}>{t('language')}</Text>
+              </View>
+              <Text style={styles.settingValue}>
+                {currentLanguageInfo.flag} {currentLanguageInfo.name}
+              </Text>
+            </Surface>
+          </PressableFeedback>
 
           {/* Theme Selection */}
           <View style={styles.settingItem}>
@@ -554,7 +565,9 @@ export default function SettingsScreen() {
               <Text style={styles.settingText}>{t('theme')}</Text>
             </View>
             <View style={styles.themeButtons}>
-              <TouchableOpacity
+              <Button
+                size="sm"
+                variant={theme === 'light' ? 'primary' : 'outline'}
                 style={[
                   styles.themeButton,
                   theme === 'light' && styles.themeButtonActive
@@ -562,14 +575,16 @@ export default function SettingsScreen() {
                 onPress={() => setTheme('light')}
               >
                 <Sun size={14} color={theme === 'light' ? colors.background : colors.textSecondary} />
-                <Text style={[
+                <Button.Label style={[
                   styles.themeButtonText,
                   theme === 'light' && styles.themeButtonTextActive
                 ]}>
                   {t('light')}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+                </Button.Label>
+              </Button>
+              <Button
+                size="sm"
+                variant={theme === 'dark' ? 'primary' : 'outline'}
                 style={[
                   styles.themeButton,
                   theme === 'dark' && styles.themeButtonActive
@@ -577,14 +592,16 @@ export default function SettingsScreen() {
                 onPress={() => setTheme('dark')}
               >
                 <Moon size={14} color={theme === 'dark' ? colors.background : colors.textSecondary} />
-                <Text style={[
+                <Button.Label style={[
                   styles.themeButtonText,
                   theme === 'dark' && styles.themeButtonTextActive
                 ]}>
                   {t('dark')}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+                </Button.Label>
+              </Button>
+              <Button
+                size="sm"
+                variant={theme === 'system' ? 'primary' : 'outline'}
                 style={[
                   styles.themeButton,
                   theme === 'system' && styles.themeButtonActive
@@ -592,13 +609,13 @@ export default function SettingsScreen() {
                 onPress={() => setTheme('system')}
               >
                 <Settings size={14} color={theme === 'system' ? colors.background : colors.textSecondary} />
-                <Text style={[
+                <Button.Label style={[
                   styles.themeButtonText,
                   theme === 'system' && styles.themeButtonTextActive
                 ]}>
                   {t('auto')}
-                </Text>
-              </TouchableOpacity>
+                </Button.Label>
+              </Button>
             </View>
           </View>
 
@@ -609,55 +626,65 @@ export default function SettingsScreen() {
               <Text style={styles.settingText}>{t('fontSize')}</Text>
             </View>
             <View style={styles.fontSizeButtons}>
-              <TouchableOpacity
+              <Button
+                size="sm"
+                variant={fontSize === 'small' ? 'primary' : 'outline'}
                 style={[
                   styles.fontSizeButton,
                   fontSize === 'small' && styles.fontSizeButtonActive
                 ]}
                 onPress={() => setFontSize('small')}
               >
-                <Text style={[
+                <Button.Label style={[
                   styles.fontSizeButtonText,
                   fontSize === 'small' && styles.fontSizeButtonTextActive
                 ]}>
                   S
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+                </Button.Label>
+              </Button>
+              <Button
+                size="sm"
+                variant={fontSize === 'medium' ? 'primary' : 'outline'}
                 style={[
                   styles.fontSizeButton,
                   fontSize === 'medium' && styles.fontSizeButtonActive
                 ]}
                 onPress={() => setFontSize('medium')}
               >
-                <Text style={[
+                <Button.Label style={[
                   styles.fontSizeButtonText,
                   fontSize === 'medium' && styles.fontSizeButtonTextActive
                 ]}>
                   M
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+                </Button.Label>
+              </Button>
+              <Button
+                size="sm"
+                variant={fontSize === 'large' ? 'primary' : 'outline'}
                 style={[
                   styles.fontSizeButton,
                   fontSize === 'large' && styles.fontSizeButtonActive
                 ]}
                 onPress={() => setFontSize('large')}
               >
-                <Text style={[
+                <Button.Label style={[
                   styles.fontSizeButtonText,
                   fontSize === 'large' && styles.fontSizeButtonTextActive
                 ]}>
                   L
-                </Text>
-              </TouchableOpacity>
+                </Button.Label>
+              </Button>
             </View>
           </View>
         </View>
 
         {/* Menu Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('account')}</Text>
+          <DigitalMorphHeading
+            text={t('account')}
+            characterHeight={24}
+            style={styles.sectionTitle}
+          />
           <View style={styles.menuContainer}>
             {menuItems.map(renderMenuItem)}
           </View>
@@ -675,38 +702,44 @@ export default function SettingsScreen() {
         onRequestClose={() => setShowLanguagePicker(false)}
       >
         <View style={styles.modal}>
-          <View style={styles.modalContent}>
+          <Card style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{t('selectLanguage')}</Text>
-              <TouchableOpacity
+              <Button
+                isIconOnly
+                size="sm"
+                variant="ghost"
                 style={styles.closeButton}
                 onPress={() => setShowLanguagePicker(false)}
               >
                 <X size={18} color={colors.textSecondary} />
-              </TouchableOpacity>
+              </Button>
             </View>
             <ScrollView>
               {availableLanguages.map((language) => (
-                <TouchableOpacity
+                <PressableFeedback
                   key={language.code}
-                  style={[
-                    styles.languageOption,
-                    currentLanguageInfo.code === language.code && styles.languageSelected
-                  ]}
                   onPress={() => handleLanguageChange(language.code)}
                 >
-                  <Text style={styles.languageFlag}>{language.flag}</Text>
-                  <View style={styles.languageInfo}>
-                    <Text style={styles.languageName}>{language.name}</Text>
-                    <Text style={styles.languageNative}>{language.nativeName}</Text>
-                  </View>
-                  {currentLanguageInfo.code === language.code && (
-                    <Check size={20} color={colors.primary} />
-                  )}
-                </TouchableOpacity>
+                  <Surface
+                    style={[
+                      styles.languageOption,
+                      currentLanguageInfo.code === language.code && styles.languageSelected
+                    ]}
+                  >
+                    <Text style={styles.languageFlag}>{language.flag}</Text>
+                    <View style={styles.languageInfo}>
+                      <Text style={styles.languageName}>{language.name}</Text>
+                      <Text style={styles.languageNative}>{language.nativeName}</Text>
+                    </View>
+                    {currentLanguageInfo.code === language.code && (
+                      <Check size={20} color={colors.primary} />
+                    )}
+                  </Surface>
+                </PressableFeedback>
               ))}
             </ScrollView>
-          </View>
+          </Card>
         </View>
       </Modal>
     </SafeAreaView>

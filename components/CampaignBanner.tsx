@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Linking } from 'react-native';
+import { View, StyleSheet, Image, Linking } from 'react-native';
+import { Card, PressableFeedback, Text } from 'heroui-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { Campaign, incrementCampaignViews, incrementCampaignClicks } from '../lib/campaigns';
 
@@ -80,22 +81,24 @@ export default function CampaignBanner({ campaign, aspectRatio, onPress }: Campa
   });
 
   return (
-    <TouchableOpacity style={styles.container} onPress={handlePress} activeOpacity={0.8}>
-      <Image source={{ uri: getImageSource() }} style={styles.image} />
-      {(campaign.title || campaign.description) && (
-        <View style={styles.overlay}>
-          {campaign.title && (
-            <Text style={styles.title} numberOfLines={1}>
-              {campaign.title}
-            </Text>
-          )}
-          {campaign.description && aspectRatio === '1:2' && (
-            <Text style={styles.description} numberOfLines={2}>
-              {campaign.description}
-            </Text>
-          )}
-        </View>
-      )}
-    </TouchableOpacity>
+    <PressableFeedback onPress={handlePress}>
+      <Card style={styles.container}>
+        <Image source={{ uri: getImageSource() }} style={styles.image} />
+        {(campaign.title || campaign.description) && (
+          <View style={styles.overlay}>
+            {campaign.title && (
+              <Text style={styles.title} numberOfLines={1}>
+                {campaign.title}
+              </Text>
+            )}
+            {campaign.description && aspectRatio === '1:2' && (
+              <Text style={styles.description} numberOfLines={2}>
+                {campaign.description}
+              </Text>
+            )}
+          </View>
+        )}
+      </Card>
+    </PressableFeedback>
   );
 }

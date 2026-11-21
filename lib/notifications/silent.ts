@@ -78,8 +78,8 @@ export class SilentNotificationHandler {
       const data = notification.request.content.data;
       
       // Check if this is a silent notification
-      if (data?.silent === true || data?.type?.includes('background')) {
-        this.handleSilentNotification(data as SilentNotificationPayload);
+      if (data && (data.silent === true || (typeof data.type === 'string' && data.type.includes('background')))) {
+        this.handleSilentNotification(data as unknown as SilentNotificationPayload);
       }
     });
 

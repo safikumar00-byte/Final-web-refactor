@@ -1,12 +1,7 @@
 import { Tabs } from 'expo-router';
-import { TrendingUp, Wallet, ChartBar as BarChart3, User, PhoneIncoming as HomeIcon, Calculator as CalculatorIcon, View, Settings2, Bell, LucideHome, SettingsIcon } from 'lucide-react-native';
+import { TrendingUp, Calculator as CalculatorIcon, LucideHome, SettingsIcon, History } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { StyleSheet, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
-import NotificationSheet from '@/components/NotificationSheet';
-import SetupGuide from '@/components/SetupGuide';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
   const { colors, isDark, fontSizes } = useTheme();
@@ -47,6 +42,15 @@ export default function TabLayout() {
           title: t('signals'),
           tabBarIcon: ({ size, color }) => (
             <TrendingUp size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="history"
+        options={{
+          title: t('history'),
+          tabBarIcon: ({ size, color }) => (
+            <History size={size} color={color} />
           ),
         }}
       />

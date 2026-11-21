@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   Alert,
-  ActivityIndicator,
 } from 'react-native';
+import { Button, Card, Spinner, Surface, Text } from 'heroui-native';
 import { Bell, Play, Settings, CircleCheck as CheckCircle, CircleAlert as AlertCircle } from 'lucide-react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { silentNotificationHandler, SilentNotificationType } from '../lib/notifications';
@@ -329,20 +327,21 @@ export default function SilentNotificationTester() {
         {/* Background Sync Test */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Background Sync Manager</Text>
-          <TouchableOpacity
+          <Button
+            variant="primary"
             style={styles.syncButton}
             onPress={handleTestBackgroundSync}
-            disabled={testing === 'background-sync-manager'}
+            isDisabled={testing === 'background-sync-manager'}
           >
             {testing === 'background-sync-manager' ? (
-              <ActivityIndicator size="small" color={colors.background} />
+              <Spinner size="sm" />
             ) : (
               <Settings size={20} color={colors.background} />
             )}
-            <Text style={styles.syncButtonText}>
+            <Button.Label style={styles.syncButtonText}>
               {testing === 'background-sync-manager' ? 'Testing...' : 'Test Background Sync'}
-            </Text>
-          </TouchableOpacity>
+            </Button.Label>
+          </Button>
         </View>
 
         {/* Silent Notification Types */}
@@ -355,28 +354,32 @@ export default function SilentNotificationTester() {
                 <Text style={styles.testButtonDescription}>{item.description}</Text>
               </View>
               <View style={styles.testButtonActions}>
-                <TouchableOpacity
+                <Button
+                  size="sm"
+                  variant="primary"
                   style={styles.actionButton}
                   onPress={() => handleTestSilentNotification(item.type)}
-                  disabled={testing === item.type}
+                  isDisabled={testing === item.type}
                 >
                   {testing === item.type ? (
-                    <ActivityIndicator size="small" color={colors.background} />
+                    <Spinner size="sm" />
                   ) : (
-                    <Text style={styles.actionButtonText}>Local</Text>
+                    <Button.Label style={styles.actionButtonText}>Local</Button.Label>
                   )}
-                </TouchableOpacity>
-                <TouchableOpacity
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
                   style={[styles.actionButton, styles.actionButtonSecondary]}
                   onPress={() => handleTestPushSilentNotification(item.type)}
-                  disabled={testing === `push-${item.type}`}
+                  isDisabled={testing === `push-${item.type}`}
                 >
                   {testing === `push-${item.type}` ? (
-                    <ActivityIndicator size="small" color={colors.background} />
+                    <Spinner size="sm" />
                   ) : (
-                    <Text style={styles.actionButtonText}>Push</Text>
+                    <Button.Label style={styles.actionButtonText}>Push</Button.Label>
                   )}
-                </TouchableOpacity>
+                </Button>
               </View>
             </View>
           ))}
@@ -387,9 +390,9 @@ export default function SilentNotificationTester() {
           <View style={styles.resultsHeader}>
             <Text style={styles.sectionTitle}>Test Results</Text>
             {results.length > 0 && (
-              <TouchableOpacity style={styles.clearButton} onPress={clearResults}>
-                <Text style={styles.clearButtonText}>Clear</Text>
-              </TouchableOpacity>
+              <Button size="sm" variant="ghost" style={styles.clearButton} onPress={clearResults}>
+                <Button.Label style={styles.clearButtonText}>Clear</Button.Label>
+              </Button>
             )}
           </View>
           
@@ -397,7 +400,7 @@ export default function SilentNotificationTester() {
             <Text style={styles.emptyResults}>No test results yet</Text>
           ) : (
             results.map((result, index) => (
-              <View key={index} style={styles.resultItem}>
+              <Surface key={index} style={styles.resultItem}>
                 <View style={styles.resultHeader}>
                   <Text style={styles.resultType}>{result.type}</Text>
                   <View style={styles.resultStatus}>
@@ -427,7 +430,7 @@ export default function SilentNotificationTester() {
                     Error: {result.error}
                   </Text>
                 )}
-              </View>
+              </Surface>
             ))
           )}
         </View>

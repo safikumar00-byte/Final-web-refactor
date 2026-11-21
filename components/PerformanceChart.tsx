@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { Card, Text } from 'heroui-native';
 import { LineChart, BarChart } from 'react-native-chart-kit';
 import { TrendingUp, TrendingDown, Target, Award } from 'lucide-react-native';
 import { useTheme } from '../contexts/ThemeContext';
@@ -139,29 +140,37 @@ export default function PerformanceChart() {
 
       {/* Metrics Grid */}
       <View style={styles.metricsGrid}>
-        <View style={styles.metricCard}>
-          <Target size={24} color={colors.primary} />
-          <Text style={styles.metricValue}>{metrics?.totalSignals || 0}</Text>
-          <Text style={styles.metricLabel}>Total Signals</Text>
-        </View>
+        <Card style={styles.metricCard}>
+          <Card.Body style={{ alignItems: 'center', padding: 0 }}>
+            <Target size={24} color={colors.primary} />
+            <Text style={styles.metricValue}>{metrics?.totalSignals || 0}</Text>
+            <Text style={styles.metricLabel}>Total Signals</Text>
+          </Card.Body>
+        </Card>
 
-        <View style={styles.metricCard}>
-          <Award size={24} color={colors.success} />
-          <Text style={styles.metricValue}>{(metrics?.winRate || 0).toFixed(1)}%</Text>
-          <Text style={styles.metricLabel}>Win Rate</Text>
-        </View>
+        <Card style={styles.metricCard}>
+          <Card.Body style={{ alignItems: 'center', padding: 0 }}>
+            <Award size={24} color={colors.success} />
+            <Text style={styles.metricValue}>{(metrics?.winRate || 0).toFixed(1)}%</Text>
+            <Text style={styles.metricLabel}>Win Rate</Text>
+          </Card.Body>
+        </Card>
 
-        <View style={styles.metricCard}>
-          <TrendingUp size={24} color={colors.secondary} />
-          <Text style={styles.metricValue}>${(metrics?.totalPnL || 0).toFixed(0)}</Text>
-          <Text style={styles.metricLabel}>Total P&L</Text>
-        </View>
+        <Card style={styles.metricCard}>
+          <Card.Body style={{ alignItems: 'center', padding: 0 }}>
+            <TrendingUp size={24} color={colors.secondary} />
+            <Text style={styles.metricValue}>${(metrics?.totalPnL || 0).toFixed(0)}</Text>
+            <Text style={styles.metricLabel}>Total P&L</Text>
+          </Card.Body>
+        </Card>
 
-        <View style={styles.metricCard}>
-          <TrendingDown size={24} color={colors.warning} />
-          <Text style={styles.metricValue}>{(metrics?.riskRewardRatio || 0).toFixed(1)}</Text>
-          <Text style={styles.metricLabel}>Avg R:R</Text>
-        </View>
+        <Card style={styles.metricCard}>
+          <Card.Body style={{ alignItems: 'center', padding: 0 }}>
+            <TrendingDown size={24} color={colors.warning} />
+            <Text style={styles.metricValue}>{(metrics?.riskRewardRatio || 0).toFixed(1)}</Text>
+            <Text style={styles.metricLabel}>Avg R:R</Text>
+          </Card.Body>
+        </Card>
       </View>
 
       {/* P&L Chart */}
@@ -184,6 +193,8 @@ export default function PerformanceChart() {
           data={winRateData}
           width={screenWidth - 80}
           height={220}
+          yAxisLabel=""
+          yAxisSuffix=""
           chartConfig={{
             ...chartConfig,
             color: (opacity = 1) => colors.primary,

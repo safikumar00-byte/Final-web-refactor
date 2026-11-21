@@ -1,6 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Button, Card, Text } from 'heroui-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import SignalCard from '../../components/SignalCard';
@@ -9,17 +11,22 @@ import { subscribeToSignals } from '../../supabase/signals';
 import { Signal } from '../../lib/supabase';
 import { Campaign, getRandomSignalsPageCampaign } from '../../lib/campaigns';
 import { Award, ChartBar, DollarSign, Target, TrendingDown, TrendingUp } from 'lucide-react-native';
+import SignalCardSkeleton from '../../components/skeletons/SignalCardSkeleton';
+import DigitalMorphHeading from '../../components/DigitalMorphHeading';
+import DigitalOdometer from '../../components/DigitalOdometer';
 
 export default function SignalsScreen() {
   const { colors, fontSizes } = useTheme();
   const { t } = useLanguage();
   const [signals, setSignals] = useState<Signal[]>([]);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState('all');
   const [campaign, setCampaign] = useState<Campaign | null>(null);
 
   const handleSignalsUpdate = useCallback((newSignals: Signal[]) => {
     setSignals(newSignals);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -110,75 +117,106 @@ export default function SignalsScreen() {
         }
         showsVerticalScrollIndicator={false}
       >
-        <View style={{ padding: 20 }}>
-          <Text style={{
-            fontSize: fontSizes.large + 4,
-            fontWeight: 'bold',
-            color: colors.text,
-            fontFamily: 'Inter-Bold',
-            marginBottom: 12
-          }}>{t('signalsTitle')}</Text>
+        <Animated.View entering={FadeInDown.duration(400)} style={{ padding: 20 }}>
+          <DigitalMorphHeading
+            text={t('signalsTitle')}
+            characterHeight={30}
+            style={{
+              fontSize: fontSizes.large + 4,
+              fontWeight: 'bold',
+              color: colors.text,
+              fontFamily: 'Inter-Bold',
+              marginBottom: 12,
+            }}
+            glowColor="rgba(34, 197, 94, 0.25)"
+          />
 
           <View style={styles.statsGrid}>
-            <View style={styles.statCard}>
-              {/* <Target size={24} color={colors.success} /> */}
-              <View style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={styles.statLabel}>{t('totalTrades')}</Text>
-                <Text style={styles.statValue}>{portfolioStats.totalTrades}</Text>
-              </View>
-            </View>
-            <View style={styles.statCard}>
-              {/* <TrendingUp size={24} color={colors.success} /> */}
-              <View style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={styles.statLabel}>{t('profitTrades')}</Text>
-                <Text style={styles.statValue}>{portfolioStats.profitTrades}</Text>
-              </View>
-            </View>
-            <View style={styles.statCard}>
-              {/* <TrendingDown size={24} color={colors.error} /> */}
-              <View style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={styles.statLabel}>{t('lossTrades')}</Text>
-                <Text style={styles.statValue}>{portfolioStats.lossTrades}</Text>
-              </View>
-            </View>
-            <View style={styles.statCard}>
-              {/* <ChartBar size={24} color={colors.primary} /> */}
-              <View style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={styles.statLabel}>{t('activeTrades')}</Text>
-                <Text style={styles.statValue}>{activeSignals.length}</Text>
-              </View>
-            </View>
+            <Card style={styles.statCard}>
+              <Card.Body style={{ width: '100%', padding: 0 }}>
+                <View style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text style={styles.statLabel}>{t('totalTrades')}</Text>
+                  <DigitalOdometer
+                    value={portfolioStats.totalTrades}
+                    digitHeight={22}
+                    textStyle={styles.statValue}
+                  />
+                </View>
+              </Card.Body>
+            </Card>
+            <Card style={styles.statCard}>
+              <Card.Body style={{ width: '100%', padding: 0 }}>
+                <View style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text style={styles.statLabel}>{t('profitTrades')}</Text>
+                  <DigitalOdometer
+                    value={portfolioStats.profitTrades}
+                    digitHeight={22}
+                    textStyle={[styles.statValue, { color: colors.success }]}
+                  />
+                </View>
+              </Card.Body>
+            </Card>
+            <Card style={styles.statCard}>
+              <Card.Body style={{ width: '100%', padding: 0 }}>
+                <View style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text style={styles.statLabel}>{t('lossTrades')}</Text>
+                  <DigitalOdometer
+                    value={portfolioStats.lossTrades}
+                    digitHeight={22}
+                    textStyle={[styles.statValue, { color: colors.error }]}
+                  />
+                </View>
+              </Card.Body>
+            </Card>
+            <Card style={styles.statCard}>
+              <Card.Body style={{ width: '100%', padding: 0 }}>
+                <View style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text style={styles.statLabel}>{t('activeTrades')}</Text>
+                  <DigitalOdometer
+                    value={activeSignals.length}
+                    digitHeight={22}
+                    textStyle={[styles.statValue, { color: colors.primary }]}
+                  />
+                </View>
+              </Card.Body>
+            </Card>
           </View>
 
           {/* Filter Buttons */}
           <View style={{ flexDirection: 'row', gap: 8, marginVertical: 12 }}>
             {['all', 'active', 'closed'].map(f => (
-              <TouchableOpacity
+              <Button
                 key={f}
+                size="sm"
+                variant={filter === f ? 'primary' : 'secondary'}
                 style={{
-                  paddingHorizontal: 16,
-                  paddingVertical: 6,
                   borderRadius: 16,
-                  backgroundColor: filter === f ? colors.primary : colors.surface
+                  backgroundColor: filter === f ? colors.primary : colors.surface,
                 }}
                 onPress={() => setFilter(f)}
               >
-                <Text style={{
-                  color: filter === f ? colors.background : colors.text,
-                  fontFamily: 'Inter-Medium',
-                  fontSize: fontSizes.medium
-                }}>
+                <Button.Label
+                  style={{
+                    color: filter === f ? colors.background : colors.text,
+                    fontFamily: 'Inter-Medium',
+                    fontSize: fontSizes.medium,
+                  }}
+                >
                   {t(f.toUpperCase().toLowerCase())}
-                </Text>
-              </TouchableOpacity>
+                </Button.Label>
+              </Button>
             ))}
           </View>
 
-          {/* Signal Cards */}
-          {filteredSignals.map(signal => (
-            <SignalCard key={signal.id} signal={signal} />
-          ))}
-        </View>
+          {/* Signal Cards with Skeleton Loading */}
+          {loading && signals.length === 0 ? (
+            <SignalCardSkeleton count={3} />
+          ) : (
+            filteredSignals.map(signal => (
+              <SignalCard key={signal.id} signal={signal} />
+            ))
+          )}
+        </Animated.View>
       </ScrollView>
         {/* Campaign Banner */}
         {campaign && (

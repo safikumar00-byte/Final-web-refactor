@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
-  TouchableOpacity,
   Modal,
   Pressable,
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { Button, Card, Chip, PressableFeedback, Surface, Text } from 'heroui-native';
 import { Clock, Target, TriangleAlert as AlertTriangle, Check as CheckIcon, X, CheckCheck, CrossIcon, StopCircle, XIcon, XCircleIcon } from 'lucide-react-native';
 import { Signal } from '../lib/supabase';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import CampaignBanner from './CampaignBanner';
+import PulsingLiveDot from './PulsingLiveDot';
 import { Campaign, getRandomSignalModalCampaign } from '../lib/campaigns';
+import DigitalOdometer from './DigitalOdometer';
 
 interface SignalCardProps {
   signal: Signal;
@@ -204,32 +206,70 @@ export default function SignalCard({ signal }: SignalCardProps) {
 
 
   return (
-    <>
-      <TouchableOpacity style={styles.container} onPress={() => setVisible(true)}>
-        <View style={styles.header}>
-          <View style={styles.pairContainer}>
-            <Text style={styles.pair}>{signal.pair}</Text>
-            <View style={styles.typeLabel}>
-              <Text style={styles.typeLabelText}>{signal.type}</Text>
+    <Animated.View entering={FadeInDown.springify().damping(15)}>
+      <PressableFeedback onPress={() => setVisible(true)}>
+        <Card style={styles.container}>
+          <Card.Header style={[styles.header, { padding: 0 }]}>
+            <View style={styles.pairContainer}>
+              {signal.status === 'active' && (
+                <PulsingLiveDot color={colors.success} size={7} />
+              )}
+              <Text style={styles.pair}>{signal.pair}</Text>
+              <Chip
+                size="sm"
+                variant="soft"
+                color={signal.type === 'BUY' ? 'success' : 'danger'}
+                style={{ borderRadius: 6 }}
+              >
+                <Chip.Label style={styles.typeLabelText}>{signal.type}</Chip.Label>
+              </Chip>
+            </View>
+            <Text style={{ color: getStatusColor(signal.status) }}>
+              {t(signal.status.toLowerCase())}
+            </Text>
+          </Card.Header>
+
+          {/* Pricing Quick View */}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 8 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <Text style={{ fontSize: fontSizes.small, color: colors.textSecondary }}>Entry:</Text>
+              <DigitalOdometer
+                value={formatPrice(signal.entry_price)}
+                digitHeight={16}
+                textStyle={{ fontSize: fontSizes.small, color: colors.text, fontWeight: '600' }}
+              />
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <Text style={{ fontSize: fontSizes.small, color: colors.textSecondary }}>TP1:</Text>
+              <DigitalOdometer
+                value={signal.take_profit_levels?.[0] ? formatPrice(signal.take_profit_levels[0]) : '-'}
+                digitHeight={16}
+                textStyle={{ fontSize: fontSizes.small, color: colors.success, fontWeight: '600' }}
+              />
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <Text style={{ fontSize: fontSizes.small, color: colors.textSecondary }}>SL:</Text>
+              <DigitalOdometer
+                value={formatPrice(signal.stop_loss)}
+                digitHeight={16}
+                textStyle={{ fontSize: fontSizes.small, color: colors.error, fontWeight: '600' }}
+              />
             </View>
           </View>
-          <Text style={{ color: getStatusColor(signal.status) }}>
-            {t(signal.status.toLowerCase())}
-          </Text>
-        </View>
 
-        <View style={styles.footer}>
-          <View style={styles.metaInfo}>
-            <Clock size={14} color={colors.textSecondary} />
-            <Text style={styles.timeText}>{getTimeAgo(signal.timestamp)}</Text>
-            <Text style={styles.timeText}>•</Text>
-            <Text style={styles.accuracyText}>{t('accuracy', { value: signal.accuracy })}</Text>
-          </View>
-          {signal.risk_reward && (
-            <Text style={styles.riskReward}>{t('riskReward', { value: signal.risk_reward })}</Text>
-          )}
-        </View>
-      </TouchableOpacity>
+          <Card.Footer style={[styles.footer, { padding: 0, marginTop: 4 }]}>
+            <View style={styles.metaInfo}>
+              <Clock size={14} color={colors.textSecondary} />
+              <Text style={styles.timeText}>{getTimeAgo(signal.timestamp)}</Text>
+              <Text style={styles.timeText}>•</Text>
+              <Text style={styles.accuracyText}>{t('accuracy', { value: signal.accuracy })}</Text>
+            </View>
+            {signal.risk_reward && (
+              <Text style={styles.riskReward}>{t('riskReward', { value: signal.risk_reward })}</Text>
+            )}
+          </Card.Footer>
+        </Card>
+      </PressableFeedback>
 
       <Modal
         visible={visible}
@@ -241,46 +281,65 @@ export default function SignalCard({ signal }: SignalCardProps) {
           <Pressable style={styles.bottomSheet} onPress={(e) => e.stopPropagation()}>
             <View style={styles.header}>
               <Text style={styles.sheetTitle}>{signal.pair} ({signal.type})</Text>
-              <TouchableOpacity style={styles.closeButton} onPress={() => setVisible(false)}>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="ghost"
+                style={styles.closeButton}
+                onPress={() => setVisible(false)}
+              >
                 <X size={18} color={colors.textSecondary} />
-              </TouchableOpacity>
+              </Button>
             </View>
-            <Text style={styles.sheetItem}>
-              {t('entryPrice')}: {formatPrice(signal.entry_price)}
-            </Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <Text style={styles.sheetItem}>{t('entryPrice')}:</Text>
+              <DigitalOdometer
+                value={formatPrice(signal.entry_price)}
+                digitHeight={20}
+                textStyle={[styles.sheetItem, { fontWeight: 'bold' }]}
+              />
+            </View>
             <View style={styles.takeProfitContainer}>
               {signal.take_profit_levels.map((tp, index) => {
                 const isReached = signal.current_price !== undefined && signal.current_price !== null && signal.current_price >= tp;
 
                 return (
-                  <View key={index} style={styles.takeProfitItem}>
+                  <Surface key={index} style={styles.takeProfitItem}>
                     <Text style={styles.takeProfitText}>
                       {t('takeProfit')}-{index + 1}:
                     </Text>
-                    <Text style={styles.takeProfitText}>
-                      {formatPrice(tp)}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      <DigitalOdometer
+                        value={formatPrice(tp)}
+                        digitHeight={18}
+                        textStyle={styles.takeProfitText}
+                      />
                       <CheckCheck style={{ display: isReached ? 'flex' : 'none' }}
                         size={16}
                         color={colors.success}
                       />
-                    </Text>
-                  </View>
+                    </View>
+                  </Surface>
                 );
               })}
             </View>
 
-            <View style={styles.takeProfitItem}>
+            <Surface style={styles.takeProfitItem}>
               <Text style={styles.takeProfitText}>
                 {t('stopLoss')}:
               </Text>
-              <Text style={styles.takeProfitText}>
-                {formatPrice(signal.stop_loss)}
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <DigitalOdometer
+                  value={formatPrice(signal.stop_loss)}
+                  digitHeight={18}
+                  textStyle={styles.takeProfitText}
+                />
                 <XCircleIcon style={{ display: signal.current_price !== undefined && signal.current_price <= signal.stop_loss ? 'flex' : 'none' }}
                   size={16}
                   color={colors.error}
                 />
-              </Text>
-            </View>
+              </View>
+            </Surface>
 
             <Text style={styles.sheetItem}>
             </Text>
@@ -301,6 +360,6 @@ export default function SignalCard({ signal }: SignalCardProps) {
           </Pressable>
         </Pressable>
       </Modal>
-    </>
+    </Animated.View>
   );
 }

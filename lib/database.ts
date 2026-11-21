@@ -53,12 +53,29 @@ export async function fetchPriceSummary(pair: string): Promise<PriceSummary | nu
       .eq('pair', pair)
       .single();
 
-    if (error) {
+    if (error || !data) {
       console.error(`Error fetching price summary for ${pair}:`, error);
       return null;
     }
 
-    return data;
+    const openPrice = data.open_price || data.current_price;
+    const changeAmount = data.change_amount !== undefined && data.change_amount !== null
+      ? data.change_amount
+      : (data.current_price - openPrice);
+    const changePercent = data.change_percent !== undefined && data.change_percent !== null
+      ? data.change_percent
+      : (openPrice > 0 ? ((data.current_price - openPrice) / openPrice) * 100 : 0);
+
+    return {
+      pair: data.pair,
+      current_price: data.current_price,
+      high_price: data.high_price,
+      low_price: data.low_price,
+      volume: data.volume || '0',
+      change_amount: changeAmount,
+      change_percent: changePercent,
+      updated_at: data.updated_at,
+    };
   } catch (error) {
     console.error(`Network error fetching price summary for ${pair}:`, error);
     return null;
@@ -356,11 +373,47 @@ function getMockNotifications(): NotificationData[] {
     {
       id: '1',
       type: 'signal',
-      title: 'Signal Closed - Profit!',
-      message: 'XAU/USD BUY signal closed with +$245 profit',
+      title: 'XAU/USD Target 2 Hit! 🎯',
+      message: 'Gold BUY signal reached Take Profit 2 at $2,658.50 with +85 pips gain.',
+      status: 'pending',
+      sent_at: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+      created_at: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+    },
+    {
+      id: '2',
+      type: 'alert',
+      title: 'High Volatility Detected ⚡',
+      message: 'US Core CPI data release in 30 minutes. Expect increased market spreads on metals.',
+      status: 'pending',
+      sent_at: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+      created_at: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+    },
+    {
+      id: '3',
+      type: 'achievement',
+      title: 'Weekly Profit Milestone! 🏆',
+      message: 'You have achieved a 75% win rate across 12 closed signals this week.',
       status: 'sent',
-      sent_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-      created_at: new Date().toISOString(),
+      sent_at: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
+      created_at: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
+    },
+    {
+      id: '4',
+      type: 'signal',
+      title: 'New XAG/USD Signal Posted 📈',
+      message: 'Silver SELL order active at $31.42 with TP1 at $31.10 and SL at $31.65.',
+      status: 'sent',
+      sent_at: new Date(Date.now() - 6 * 3600 * 1000).toISOString(),
+      created_at: new Date(Date.now() - 6 * 3600 * 1000).toISOString(),
+    },
+    {
+      id: '5',
+      type: 'announcement',
+      title: 'System Upgrade Complete 🚀',
+      message: 'Real-time WebSocket latency has been upgraded to sub-50ms execution speed.',
+      status: 'sent',
+      sent_at: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
+      created_at: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
     },
   ];
 }
