@@ -447,6 +447,7 @@ export default function SettingsScreen() {
       backgroundColor: colors.background,
       borderRadius: 16,
       width: '90%',
+      maxWidth: 400,
       maxHeight: '70%',
       overflow: 'hidden',
     },

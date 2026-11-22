@@ -174,6 +174,7 @@ export default function NotificationSheet({ visible, onClose }: NotificationShee
       flex: 1,
       backgroundColor: 'rgba(0, 0, 0, 0.65)',
       justifyContent: 'flex-end',
+      alignItems: 'center',
     },
     sheetWrapper: {
       backgroundColor: colors.background,
@@ -182,8 +183,11 @@ export default function NotificationSheet({ visible, onClose }: NotificationShee
       overflow: 'hidden',
       maxHeight: '85%',
       width: '100%',
+      maxWidth: 440,
       flex: 1,
       borderTopWidth: 1,
+      borderLeftWidth: 1,
+      borderRightWidth: 1,
       borderColor: colors.border,
     },
     sheetContainer: {

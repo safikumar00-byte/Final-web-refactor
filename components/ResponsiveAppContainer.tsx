@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Platform, useWindowDimensions } from 'react-native';
+import { usePathname } from 'expo-router';
 import { useTheme } from '../contexts/ThemeContext';
 
 interface ResponsiveAppContainerProps {
@@ -8,16 +9,25 @@ interface ResponsiveAppContainerProps {
 
 /**
  * ResponsiveAppContainer:
- * - On desktop web (viewport width > 500px): Centers the mobile application shell
- *   with an optimal max-width (~440px), elegant neutral desktop background, subtle borders and shadow.
- * - On mobile browsers (viewport width <= 500px) and native devices: Renders full width (100%),
- *   preserving all native touch areas, safe areas, and bottom navigation.
+ * - On desktop web (viewport width > 768px):
+ *   - Centers the application horizontally with a maximum width of ~440px.
+ *   - Minimum height: 100dvh / 100%.
+ *   - Dark outer background consistent with application theme (#07090E).
+ *   - Subtle shadow and clean lateral borders.
+ *   - Prevents horizontal overflow; scrolling happens within application content areas.
+ *   - Bottom navigation stays fixed inside the application container, not browser viewport.
+ * - On mobile browsers (viewport width <= 768px) and native devices:
+ *   - Renders full width (100%), preserving all native touch areas, safe areas, and bottom navigation.
+ * - Dedicated presentation route (/desktop-preview):
+ *   - Bypasses the 440px constraint so the desktop mock-up studio operates full width.
  */
 export default function ResponsiveAppContainer({ children }: ResponsiveAppContainerProps) {
   const { width } = useWindowDimensions();
   const { colors } = useTheme();
+  const pathname = usePathname();
 
-  const isDesktopWeb = Platform.OS === 'web' && width > 500;
+  const isPreviewRoute = pathname === '/desktop-preview' || pathname?.includes('desktop-preview');
+  const isDesktopWeb = Platform.OS === 'web' && width > 768 && !isPreviewRoute;
 
   if (!isDesktopWeb) {
     return <View style={styles.mobileContainer}>{children}</View>;
@@ -54,6 +64,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
+    minHeight: Platform.select({ web: '100dvh' as any, default: '100%' }),
     backgroundColor: '#07090E',
     alignItems: 'center',
     justifyContent: 'center',
@@ -71,9 +82,11 @@ const styles = StyleSheet.create({
     pointerEvents: 'none' as any,
   },
   desktopAppFrame: {
+    flex: 1,
     width: '100%',
     maxWidth: 440,
     height: '100%',
+    minHeight: Platform.select({ web: '100dvh' as any, default: '100%' }),
     maxHeight: '100%',
     position: 'relative',
     overflow: 'hidden',
@@ -81,7 +94,7 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     ...Platform.select({
       web: {
-        boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+        boxShadow: '0 0 60px -15px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.06)',
       } as any,
       default: {
         elevation: 12,

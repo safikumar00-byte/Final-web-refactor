@@ -68,7 +68,7 @@ export default function SetupGuide({ visible, onClose }: SetupGuideProps) {
       backgroundColor: colors.background,
       borderRadius: 22,
       width: '100%',
-      maxWidth: 520,
+      maxWidth: 440,
       height: '85%',
       maxHeight: 700,
       borderWidth: 1,

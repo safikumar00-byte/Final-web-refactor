@@ -57,7 +57,8 @@ const LANGUAGE_STORAGE_KEY = 'app_language';
 
 // Get device locale
 export function getDeviceLocale(): string {
-  const deviceLocale = Localization.locale;
+  const locales = Localization.getLocales?.();
+  const deviceLocale = locales?.[0]?.languageTag || (Localization as any).locale || 'en';
   const languageCode = deviceLocale.split('-')[0]; // Get language code without region
   
   // Check if we support this language
