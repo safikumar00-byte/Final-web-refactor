@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { View, StyleSheet, ScrollView, RefreshControl, Platform } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PulsingLiveDot from '../../components/PulsingLiveDot';
@@ -55,30 +55,42 @@ export default function HistoryScreen() {
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
   const [selectedPair, setSelectedPair] = useState<string>('ALL');
 
+  const isMountedRef = useRef(true);
+
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const data = await fetchSignals();
-      setSignals(data);
+      if (isMountedRef.current) {
+        setSignals(data);
+      }
     } catch (err) {
-      console.error('Error fetching trade history:', err);
-      setError('Failed to load trade history');
+      if (isMountedRef.current) {
+        console.error('Error fetching trade history:', err);
+        setError('Failed to load trade history');
+      }
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   }, []);
 
   useEffect(() => {
+    isMountedRef.current = true;
     loadData();
 
     // Real-time subscription to signals
     const unsubscribe = subscribeToSignals((newSignals) => {
-      setSignals(newSignals);
+      if (isMountedRef.current) {
+        setSignals(newSignals);
+      }
     });
 
     return () => {
+      isMountedRef.current = false;
       if (typeof unsubscribe === 'function') {
         unsubscribe();
       }
@@ -517,8 +529,11 @@ export default function HistoryScreen() {
               const isWin = isClosed && (calc?.dynamicPnL ?? 0) >= 0;
               const isLoss = isClosed && (calc?.dynamicPnL ?? 0) < 0;
 
+              const SignalItemContainer = Platform.OS === 'web' ? View : Animated.View;
+              const animProps = Platform.OS === 'web' ? {} : { entering: FadeInDown.springify().damping(15) };
+
               return (
-                <Animated.View key={signal.id} entering={FadeInDown.springify().damping(15)}>
+                <SignalItemContainer key={signal.id} {...animProps}>
                   <Card
                     style={[styles.signalCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
                   >
@@ -706,7 +721,7 @@ export default function HistoryScreen() {
                       )}
                     </Card.Body>
                   </Card>
-                </Animated.View>
+                </SignalItemContainer>
               );
             })
           )}

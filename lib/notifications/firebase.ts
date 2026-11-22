@@ -15,21 +15,32 @@ import { Platform } from 'react-native';
 let webMessaging: any = null;
 
 if (Platform.OS === 'web') {
-  const firebaseConfig = {
-    apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
-    authDomain: `${process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID}.firebaseapp.com`,
-    projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket: `${process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID}.appspot.com`,
-    messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
-  };
+  const apiKey = process.env.EXPO_PUBLIC_FIREBASE_API_KEY;
+  const projectId = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
 
-  const app = initializeApp(firebaseConfig);
-  webMessaging = getMessaging(app);
+  if (apiKey && projectId) {
+    try {
+      const firebaseConfig = {
+        apiKey,
+        authDomain: `${projectId}.firebaseapp.com`,
+        projectId,
+        storageBucket: `${projectId}.appspot.com`,
+        messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+        appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
+      };
 
-  // Register service worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(() => { });
+      const app = initializeApp(firebaseConfig);
+      webMessaging = getMessaging(app);
+
+      // Register service worker
+      if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(() => { });
+      }
+    } catch (err) {
+      console.warn('[Firebase] Client initialization failed gracefully:', err);
+    }
+  } else {
+    console.warn('[Firebase] Skipping client initialization: Missing EXPO_PUBLIC_FIREBASE_* environment variables');
   }
 }
 

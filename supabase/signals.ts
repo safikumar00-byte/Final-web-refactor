@@ -8,27 +8,22 @@ export async function fetchSignals(): Promise<Signal[]> {
       .select('*')
       .order('timestamp', { ascending: false });
 
-    console.log('📦 Fetched signals:', data);
+    console.log('📦 Fetched signals:', data?.length ?? 0);
     if (error) {
       console.error('❌ Error fetching signals:', error);
       return getMockSignals();
     }
 
-    return data || getMockSignals();
+    return (data && data.length > 0) ? data : getMockSignals();
   } catch (error) {
     console.error('❌ Network error fetching signals:', error);
     return getMockSignals();
   }
 }
 
-
-// Subscribe to real-time signals with improved error handling
-export function subscribeToSignals(callback: (signals: Signal[]) => void) {
-  // First, fetch initial data
-  fetchSignals().then(callback).catch((e) => {
-    console.log('⚠️ Supabase fetch failed, using mock:', e);
-    callback(getMockSignals());
-  });
+// Subscribe to real-time signals with improved error handling & cancellation
+export function subscribeToSignals(callback: (signals: Signal[]) => void): () => void {
+  let isCancelled = false;
 
   // Set up real-time subscription with error handling
   try {
@@ -38,9 +33,12 @@ export function subscribeToSignals(callback: (signals: Signal[]) => void) {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'signals' },
         async () => {
+          if (isCancelled) return;
           try {
             const latest = await fetchSignals();
-            callback(latest);
+            if (!isCancelled) {
+              callback(latest);
+            }
           } catch (error) {
             console.error('Error in real-time update:', error);
           }
@@ -50,21 +48,24 @@ export function subscribeToSignals(callback: (signals: Signal[]) => void) {
         if (status === 'SUBSCRIBED') {
           console.log('Successfully subscribed to signals updates');
         } else if (status === 'CHANNEL_ERROR') {
-          console.error('Failed to subscribe to signals upvdates');
+          console.error('Failed to subscribe to signals updates');
         }
       });
 
-    // Return unsubscribe function
+    // Return safe unsubscribe function
     return () => {
+      isCancelled = true;
       try {
         supabase.removeChannel(channel);
       } catch (error) {
-        console.error('Error unsubscribing:', error);
+        console.error('Error unsubscribing from signals:', error);
       }
     };
   } catch (error) {
-    console.error('Error setting up subscription:', error);
-    return () => { }; // Return empty unsubscribe function
+    console.error('Error setting up signals subscription:', error);
+    return () => {
+      isCancelled = true;
+    };
   }
 }
 
@@ -106,7 +107,7 @@ export async function getActiveSignals(): Promise<Signal[]> {
       return getMockSignals().filter(s => s.status === 'active');
     }
 
-    return data || getMockSignals().filter(s => s.status === 'active');
+    return (data && data.length > 0) ? data : getMockSignals().filter(s => s.status === 'active');
   } catch (error) {
     console.error('Network error fetching active signals:', error);
     return getMockSignals().filter(s => s.status === 'active');
@@ -114,7 +115,7 @@ export async function getActiveSignals(): Promise<Signal[]> {
 }
 
 // Mock data fallback (for when Supabase is not connected)
-function getMockSignals(): Signal[] {
+export function getMockSignals(): Signal[] {
   return [
     {
       id: "1",

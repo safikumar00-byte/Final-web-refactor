@@ -19,6 +19,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import ThreeStepSplashScreen from '@/components/ThreeStepSplashScreen';
 import NotificationPermissionModal from '@/components/NotificationPermissionModal';
 import InAppNotificationToast, { NotificationToastData } from '@/components/InAppNotificationToast';
+import ResponsiveAppContainer from '@/components/ResponsiveAppContainer';
 
 // Prevent native splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -122,32 +123,35 @@ export default function RootLayout() {
       <HeroUINativeProvider>
         <LanguageProvider>
           <ThemeProvider>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="+not-found" />
-            </Stack>
-            <StatusBar style="light" />
+            <ResponsiveAppContainer>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="desktop-preview" options={{ headerShown: false }} />
+                <Stack.Screen name="+not-found" />
+              </Stack>
+              <StatusBar style="light" />
 
-            {/* Notification Permission Prompt at the start */}
-            <NotificationPermissionModal
-              visible={showNotificationModal}
-              onClose={() => setShowNotificationModal(false)}
-              onPermissionGranted={handlePermissionGranted}
-            />
-
-            {/* In-App Floating Notification Pop-up Toast */}
-            <InAppNotificationToast
-              notification={activeToast}
-              onDismiss={() => setActiveToast(null)}
-            />
-
-            {/* Native Hero Animated Three-Step Splash Screen (shows only once on first launch) */}
-            {showSplash && (
-              <ThreeStepSplashScreen
-                isReady={isReady}
-                onFinish={handleSplashFinished}
+              {/* Notification Permission Prompt at the start */}
+              <NotificationPermissionModal
+                visible={showNotificationModal}
+                onClose={() => setShowNotificationModal(false)}
+                onPermissionGranted={handlePermissionGranted}
               />
-            )}
+
+              {/* In-App Floating Notification Pop-up Toast */}
+              <InAppNotificationToast
+                notification={activeToast}
+                onDismiss={() => setActiveToast(null)}
+              />
+
+              {/* Native Hero Animated Three-Step Splash Screen (shows only once on first launch) */}
+              {showSplash && (
+                <ThreeStepSplashScreen
+                  isReady={isReady}
+                  onFinish={handleSplashFinished}
+                />
+              )}
+            </ResponsiveAppContainer>
           </ThemeProvider>
         </LanguageProvider>
       </HeroUINativeProvider>

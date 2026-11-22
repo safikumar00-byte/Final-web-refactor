@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { Button, Card, Text } from 'heroui-native';
 import { Bell, BellOff, Smartphone, CircleCheck as CheckCircle, CircleAlert as AlertCircle } from 'lucide-react-native';
@@ -21,19 +21,28 @@ export default function PushNotificationManager({ onRegistrationComplete }: Push
   const [isRegistered, setIsRegistered] = useState<boolean | null>(null);
   const [isRegistering, setIsRegistering] = useState(false);
   const [deviceId, setDeviceId] = useState<string | null>(null);
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
+    isMountedRef.current = true;
     checkRegistrationStatus();
 
     const cleanup = setupNotificationListeners();
 
-    return cleanup;
+    return () => {
+      isMountedRef.current = false;
+      if (typeof cleanup === 'function') {
+        cleanup();
+      }
+    };
   }, []);
 
   const checkRegistrationStatus = async () => {
     try {
       const raw = await getUserProfile();
       const profile = Array.isArray(raw) ? raw[0] : raw;
+
+      if (!isMountedRef.current) return;
 
       if (profile?.fcm_token?.trim()) {
         setIsRegistered(true);
@@ -45,9 +54,11 @@ export default function PushNotificationManager({ onRegistrationComplete }: Push
         console.log('📊 Push notification status: not registered');
       }
     } catch (error) {
-      console.error('❌ Error checking registration status:', error);
-      setIsRegistered(false);
-      setDeviceId(null);
+      if (isMountedRef.current) {
+        console.error('❌ Error checking registration status:', error);
+        setIsRegistered(false);
+        setDeviceId(null);
+      }
     }
   };
 

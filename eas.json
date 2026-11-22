@@ -10,6 +10,9 @@
     },
     "preview": {
       "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://govngwsrefzqnuczhzdi.supabase.co",
         "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdvdm5nd3NyZWZ6cW51Y3poemRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1MDI4NDQsImV4cCI6MjA2NjA3ODg0NH0.5W7A7aVMMo54jtYOmsVeFgbQhXtsQPhmnjZFBMNqa1k",

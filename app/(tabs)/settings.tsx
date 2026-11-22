@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -38,9 +38,10 @@ export default function SettingsScreen() {
   const [deviceId, setDeviceId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [deviceInitialized, setDeviceInitialized] = useState(false);
-
+  const isMountedRef = useRef(true);
 
   const loadDeviceInfo = useCallback(async () => {
+    if (!isMountedRef.current) return;
     try {
       setLoading(true);
       console.log('🔄 Fetching FCM token...');
@@ -53,10 +54,10 @@ export default function SettingsScreen() {
         return;
       }
 
+      if (!isMountedRef.current) return;
       const deviceId = await getCurrentDeviceId();
 
       console.log('📖 Loading device info for:', deviceId);
-
       console.log('🔍 Looking for device with FCM token:', fcmToken);
 
       // 2. Query Supabase where fcm_token matches
@@ -64,11 +65,12 @@ export default function SettingsScreen() {
         .from('user_profiles')
         .select('id, user_id, fcm_token, device_type')
         .eq('fcm_token', fcmToken)
-        .limit(1); // returns null if not found
+        .limit(1);
+
+      if (!isMountedRef.current) return;
 
       if (error) {
         console.error('❌ Supabase fetch error:', error.message);
-        Alert.alert(t('error'), t('failedToLoad'));
         return;
       }
 
@@ -81,35 +83,33 @@ export default function SettingsScreen() {
           deviceType: data[0].device_type,
         });
 
-        setDeviceId(data[0].user_id);     // set local state
-        // setDeviceProfile(data[0]);        // set local state
+        if (isMountedRef.current) {
+          setDeviceId(data[0].user_id);
+        }
       }
     } catch (error) {
-      console.error('❌ Unexpected error loading device info:', error);
-      Alert.alert(t('error'), t('failedToLoad'));
+      if (isMountedRef.current) {
+        console.error('❌ Unexpected error loading device info:', error);
+      }
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+      }
     }
-  }, [t]);
-
+  }, []);
 
   useEffect(() => {
+    isMountedRef.current = true;
     if (!deviceInitialized) {
       loadDeviceInfo().then(() => {
-        setDeviceInitialized(true);
+        if (isMountedRef.current) {
+          setDeviceInitialized(true);
+        }
       });
-
-      // Initialize silent notification system
-      // const initializeSilentSystem = async () => {
-      //   try {
-      //     await silentNotificationHandler.initialize();
-      //     await backgroundSyncManager.initialize();
-      //     console.log('✅ Silent notification system initialized');
-      //   } catch (error) {
-      //     console.error('❌ Error initializing silent system:', error);
-      //   }
-      // };
     }
+    return () => {
+      isMountedRef.current = false;
+    };
   }, [loadDeviceInfo, deviceInitialized]);
 
   const handleShare = async () => {

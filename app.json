@@ -16,9 +16,6 @@
       "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
-    "notification": {
-      "vapidPublicKey": "BFF8LCxcGGfvgAsQmV8P8brjmqCae77Hm3f19qjIiIP6KDlQHeyra19moyecFRgZNjaKwjKEq4sDJLxvmwXBq2Q"
-    },
     "plugins": [
       "expo-router",
       "expo-font",

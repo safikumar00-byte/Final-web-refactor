@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -58,24 +58,36 @@ export default function CalculatorScreen() {
     type: 'BUY' as 'BUY' | 'SELL',
   });
   const [pnlResult, setPnlResult] = useState<PnLResult | null>(null);
+  const isMountedRef = useRef(true);
 
-  // Fetch live price when pair changes
+  // Fetch live price when pair changes with unmount protection
   useEffect(() => {
+    isMountedRef.current = true;
     fetchLivePrice();
+    return () => {
+      isMountedRef.current = false;
+    };
   }, [selectedPair]);
 
   const fetchLivePrice = async () => {
+    if (!isMountedRef.current) return;
     setLoading(true);
     try {
       console.log('Fetching price for:', selectedPair);
       const price = await getForexPrice(selectedPair);
-      console.log('Fetched price:', price);
-      setLivePrice(price);
+      if (isMountedRef.current) {
+        console.log('Fetched price:', price);
+        setLivePrice(price);
+      }
     } catch (error) {
-      console.error('Error fetching live price:', error);
-      setLivePrice(null);
+      if (isMountedRef.current) {
+        console.error('Error fetching live price:', error);
+        setLivePrice(null);
+      }
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+      }
     }
   };
 
