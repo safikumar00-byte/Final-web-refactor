@@ -1,6 +1,5 @@
 // Forex trading utilities and constants
 
-import { useEffect } from "react";
 import { supabase } from "./supabase";
 
 export interface ForexPair {
@@ -72,18 +71,6 @@ const FOREX_PAIRS: Record<string, ForexPair> = {
   'EUR/GBP': { symbol: 'EUR/GBP', name: 'Euro/British Pound', pipValue: 0.0001, digits: 4 },
   'GBP/JPY': { symbol: 'GBP/JPY', name: 'British Pound/Japanese Yen', pipValue: 0.01, digits: 2 },
 };
-
-
-useEffect(() => {
-  supabase
-    .from('price_summary')
-    .select('pair, current_price')
-    .then(({ data, error }) => {
-      if (error) console.error('Error loading pairs:', error);
-      else console.log('Pairs in DB:', data);
-    });
-}, []);
-
 
 export async function getForexPrice(pair: string): Promise<number | null> {
   try {
